@@ -1,0 +1,235 @@
+{% extends "common/base.html" %}
+
+{% block title %}文件管理 - {{ block.Super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-12">
+                <ol class="breadcrumb">
+                    <li><a href="/">控制台</a></li>
+                    <li class="active"><span>文件管理</span></li>
+                </ol>
+                <h1>文件管理</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="main-box clearfix">
+                    <header class="main-box-header clearfix">
+                        <div class="pull-left">
+                            <h2>文件列表 | {{ name }}</h2>
+                            <div class="fs-path" data-path="{{ path }}">{{ path }}</div>
+                        </div>
+
+                        <div class="filter-block pull-right">
+                            <a href="javascript:;" class="btn btn-primary pull-right js-create-dir-btn">
+                                <i class="fa fa-plus-circle fa-lg"></i> 创建文件夹
+                            </a>
+                            <a href="javascript:;" class="btn btn-primary pull-right js-create-file-btn">
+                                <i class="fa fa-plus-circle fa-lg"></i> 创建文件
+                            </a>
+                        </div>
+                    </header>
+
+                    <div class="main-box-body clearfix">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <span>名称</span>
+                                        </th>
+                                        <th>
+                                            <span>修改时间</span>
+                                        </th>
+                                        <th>
+                                            <span>类型</span>
+                                        </th>
+                                        <th>
+                                            <span>大小</span>
+                                        </th>
+                                        <th>
+                                            <span>权限</span>
+                                        </th>
+                                        <th>
+                                            <span>操作</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% if parentPath != "" %}
+                                        <tr>
+                                            <td class="sys-name" colspan="7" data-name="{{ parentPath }}">
+                                                <a href="/file/index?path={{ parentPath }}" title="返回上级">..</a>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+
+                                    {% for item in list %}
+                                        <tr>
+                                            <td class="sys-name">
+                                                {% if item.isDir %}
+                                                    {% if path == "/" %}
+                                                        <a href="/file/index?path=/{{ item.namesmall }}" title="{{ item.namesmall }}">{{ item.namesmall }}</a>
+                                                    {% else %}
+                                                        <a href="/file/index?path={{ path }}/{{ item.namesmall }}" title="{{ item.namesmall }}">{{ item.namesmall }}</a>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {{ item.namesmall }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ item.time }}
+                                            </td>
+                                            <td>
+                                                {{ item.type }}
+                                            </td>
+                                            <td>
+                                                {% if item.isDir %}
+                                                    -
+                                                {% else %}
+                                                    {{ item.size }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ item.perm }}
+                                            </td>
+                                            <td style="width: 18%;">
+                                                <a href="javascript:;"
+                                                    class="table-link js-info-btn"
+                                                    data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                    title="详情">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
+
+                                                {% if !item.isDir %}
+                                                    <a href="javascript:;"
+                                                        class="table-link js-update-btn"
+                                                        data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                        title="修改">
+                                                        <span class="fa-stack">
+                                                            <i class="fa fa-square fa-stack-2x"></i>
+                                                            <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                                                        </span>
+                                                    </a>
+                                                    <a href="javascript:;"
+                                                        class="table-link js-download-btn"
+                                                        data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                        title="下载">
+                                                        <span class="fa-stack">
+                                                            <i class="fa fa-square fa-stack-2x"></i>
+                                                            <i class="fa fa-download fa-stack-1x fa-inverse"></i>
+                                                        </span>
+                                                    </a>
+                                                {% endif %}
+
+                                                <a href="javascript:;"
+                                                    class="table-link danger js-delete-btn"
+                                                    data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                    title="删除">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{{ block.Super }}
+
+<script type="text/javascript">
+;(function($) {
+    "use strict";
+
+    $(".left-nav-file").addClass("active");
+
+    // 删除
+    $('.js-delete-btn').click(function() {
+        var file = $(this).data("file");
+        var url = "/file/delete";
+
+        layer.confirm('您确定要删除吗？', {
+            btn: ['确定', '取消']
+        }, function(index){
+            $.post(url, {
+                file: file,
+            }, function(data) {
+                if (data.code == 0) {
+                    layer.msg(data.message, {
+                        icon: 1
+                    });
+
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    layer.msg(data.message, {
+                        icon: 2
+                    });
+                }
+            });
+        });
+    });
+
+    // 详情
+    $('.js-info-btn').click(function(e) {
+        var file = $(this).data("file");
+        var href = '/file/info?file=' + file;
+
+        layer.open({
+            type: 2,
+            title: '详情',
+            shadeClose: true,
+            shade: 0.2,
+            area: ['500px', '450px'],
+            content: href,
+        });
+    });
+
+    // 更新
+    $('.js-update-btn').click(function(e) {
+        var file = $(this).data("file");
+        var href = '/file/update-file?file=' + file;
+
+        layer.open({
+            type: 2,
+            title: '详情',
+            shadeClose: true,
+            shade: 0.2,
+            area: ['80%', '86%'],
+            content: href,
+        });
+    });
+
+    // 下载
+    $('.js-download-btn').click(function(e) {
+        var file = $(this).data("file");
+        var href = '/file/download-file?file=' + file;
+
+        window.open(href, '_blank');
+    });
+
+})(jQuery);
+</script>
+{% endblock %}

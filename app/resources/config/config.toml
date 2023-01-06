@@ -1,0 +1,27 @@
+[app]
+app_name = "doak-fs"
+version = "1.0.1"
+debug = true
+time_zone = "Asia/Hong_Kong"
+assets = "/static"
+
+[server]
+address = ":1323"
+csrf_token_length = 32
+csrf_context_key = "fs_csrf"
+csrf_cookie_name = "_fs_csrf"
+csrf_cookie_path = "/"
+csrf_cookie_maxage = 86400
+
+[file]
+path = "./"
+
+[user]
+names = ["admin:$2a$10$zhjk7PnTEHTAV2KPriZMhOR9ZEyzxzNykTBV/eYYQgT0Ca8vG.oAW"]
+
+[session]
+secret = "secret"
+key = "session"
+path = "/"
+max_age = 604800 # 86400 * 7
+http_only = true
