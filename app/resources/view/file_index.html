@@ -21,7 +21,12 @@
                     <header class="main-box-header clearfix">
                         <div class="pull-left">
                             <h2>文件列表 | {{ name }}</h2>
-                            <div class="fs-path" data-path="{{ path }}">{{ path }}</div>
+                            
+                            {% if path == "" %}
+                                <div class="fs-path" id="fs-path" data-path="/">/</div>
+                            {% else %}
+                                <div class="fs-path" id="fs-path" data-path="{{ path }}">{{ path }}</div>
+                            {% endif %}
                         </div>
 
                         <div class="filter-block pull-right">
@@ -73,11 +78,7 @@
                                         <tr>
                                             <td class="sys-name">
                                                 {% if item.isDir %}
-                                                    {% if path == "/" %}
-                                                        <a href="/file/index?path=/{{ item.namesmall }}" title="{{ item.namesmall }}">{{ item.namesmall }}</a>
-                                                    {% else %}
-                                                        <a href="/file/index?path={{ path }}/{{ item.namesmall }}" title="{{ item.namesmall }}">{{ item.namesmall }}</a>
-                                                    {% endif %}
+                                                    <a href="/file/index?path={{ path }}/{{ item.namesmall }}" title="{{ item.namesmall }}">{{ item.namesmall }}</a>
                                                 {% else %}
                                                     {{ item.namesmall }}
                                                 {% endif %}
@@ -98,10 +99,10 @@
                                             <td>
                                                 {{ item.perm }}
                                             </td>
-                                            <td style="width: 18%;">
+                                            <td style="width: 22%;">
                                                 <a href="javascript:;"
                                                     class="table-link js-info-btn"
-                                                    data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                    data-file="{{ path }}/{{ item.namesmall }}"
                                                     title="详情">
                                                     <span class="fa-stack">
                                                         <i class="fa fa-square fa-stack-2x"></i>
@@ -112,7 +113,7 @@
                                                 {% if !item.isDir %}
                                                     <a href="javascript:;"
                                                         class="table-link js-update-btn"
-                                                        data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                        data-file="{{ path }}/{{ item.namesmall }}"
                                                         title="修改">
                                                         <span class="fa-stack">
                                                             <i class="fa fa-square fa-stack-2x"></i>
@@ -121,7 +122,7 @@
                                                     </a>
                                                     <a href="javascript:;"
                                                         class="table-link js-download-btn"
-                                                        data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                        data-file="{{ path }}/{{ item.namesmall }}"
                                                         title="下载">
                                                         <span class="fa-stack">
                                                             <i class="fa fa-square fa-stack-2x"></i>
@@ -129,10 +130,21 @@
                                                         </span>
                                                     </a>
                                                 {% endif %}
+                                                
+                                                <a href="javascript:;"
+                                                    class="table-link js-rename-btn"
+                                                    data-file="{{ path }}/{{ item.namesmall }}"
+                                                    data-name="{{ item.namesmall }}"
+                                                    title="重命名">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
 
                                                 <a href="javascript:;"
                                                     class="table-link danger js-delete-btn"
-                                                    data-file="{% if path != "/" %}{{ path }}{% endif %}/{{ item.namesmall }}"
+                                                    data-file="{{ path }}/{{ item.namesmall }}"
                                                     title="删除">
                                                     <span class="fa-stack">
                                                         <i class="fa fa-square fa-stack-2x"></i>
@@ -228,6 +240,143 @@
         var href = '/file/download-file?file=' + file;
 
         window.open(href, '_blank');
+    });
+    
+    // 创建文件夹
+    $(".js-create-dir-btn").click(function() {
+        var content = '';
+
+        content += '<div style="padding: 10px 20px 0 20px;">文件夹名称</div>';
+        content += '<div style="padding: 5px 20px 10px 20px;"><input type="text" class="form-control" id="newDirName" placeholder="文件夹名称" value="new-dir"></div>';
+        content += '<div style="padding: 5px 20px 10px 20px;"><button type="button" class="btn btn-success pull-right js-create-dir-save-btn">确认</button></div>';
+
+        layer.open({
+            type: 1,
+            title: '创建文件夹',
+            area: ['450px', '186px'], //宽高
+            content: content,
+        });
+
+        return false;
+    });
+
+    // 创建文件夹保存
+    $("body").on('click', '.js-create-dir-save-btn', function(e) {
+        var dirName = $("#newDirName").val();
+        var dir = "{{ path }}/" + dirName;
+        
+        var url = "/file/create-dir";
+
+        $.post(url, {
+            dir: dir,
+        }, function(data) {
+            if (data.code == 0) {
+                layer.msg(data.message, {
+                    icon: 1
+                });
+
+                setTimeout(function() {
+                    location.reload();
+                }, 2000);
+            } else {
+                layer.msg(data.message, {
+                    icon: 2
+                });
+            }
+        });
+    });
+    
+    // 创建文件
+    $(".js-create-file-btn").click(function() {
+        var content = '';
+
+        content += '<div style="padding: 10px 20px 0 20px;">文件名称</div>';
+        content += '<div style="padding: 5px 20px 10px 20px;"><input type="text" class="form-control" id="newFileName" placeholder="文件名称" value="new-file.txt"></div>';
+        content += '<div style="padding: 5px 20px 10px 20px;"><button type="button" class="btn btn-success pull-right js-create-file-save-btn">确认</button></div>';
+
+        layer.open({
+            type: 1,
+            title: '创建文件',
+            area: ['450px', '186px'], //宽高
+            content: content,
+        });
+
+        return false;
+    });
+
+    // 创建文件保存
+    $("body").on('click', '.js-create-file-save-btn', function(e) {
+        var fileName = $("#newFileName").val();
+        var file = "{{ path }}/" + fileName;
+        
+        var url = "/file/create-file";
+
+        $.post(url, {
+            file: file,
+        }, function(data) {
+            if (data.code == 0) {
+                layer.msg(data.message, {
+                    icon: 1
+                });
+
+                setTimeout(function() {
+                    location.reload();
+                }, 2000);
+            } else {
+                layer.msg(data.message, {
+                    icon: 2
+                });
+            }
+        });
+    });
+    
+    // 重命名
+    $(".js-rename-btn").click(function() {
+        var oldName = $(this).data('name');
+        var content = '';
+
+        content += '<div style="padding: 10px 20px 0 20px;">重命名</div>';
+        content += '<div style="padding: 5px 20px 10px 20px;"><input type="text" class="form-control" id="newRenameName" data-name="' + oldName + '" placeholder="新名称" value="' + oldName + '"></div>';
+        content += '<div style="padding: 5px 20px 10px 20px;"><button type="button" class="btn btn-success pull-right js-rename-save-btn">确认</button></div>';
+
+        layer.open({
+            type: 1,
+            title: '重命名',
+            area: ['450px', '186px'], //宽高
+            content: content,
+        });
+
+        return false;
+    });
+
+    // 重命名保存
+    $("body").on('click', '.js-rename-save-btn', function(e) {
+        var oldName = $("#newRenameName").data('name');
+        var newName = $("#newRenameName").val();
+        
+        var oldName = "{{ path }}/" + oldName;
+        var newName = "{{ path }}/" + newName;
+        
+        var url = "/file/rename";
+
+        $.post(url, {
+            'old_name': oldName,
+            'new_name': newName,
+        }, function(data) {
+            if (data.code == 0) {
+                layer.msg(data.message, {
+                    icon: 1
+                });
+
+                setTimeout(function() {
+                    location.reload();
+                }, 2000);
+            } else {
+                layer.msg(data.message, {
+                    icon: 2
+                });
+            }
+        });
     });
 
 })(jQuery);

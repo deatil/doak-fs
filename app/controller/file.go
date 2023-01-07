@@ -39,11 +39,11 @@ func (this *File) Index(ctx echo.Context) error {
     parentPath := ""
 
     if path == "" || path == "/" {
-        path = "/"
+        path = ""
         name = "/"
     }
 
-    if path != "/" {
+    if path != "" {
         parentPath = fs.Filesystem.Dirname(path)
         parentPath = fs.Filesystem.ToSlash(parentPath)
     }
@@ -100,14 +100,60 @@ func (this *File) Delete(ctx echo.Context) error {
     return response.ReturnSuccessJson(ctx, "删除文件成功", "")
 }
 
-// 创建文件
-func (this *File) CreateFile(ctx echo.Context) error {
-    return response.ReturnSuccessJson(ctx, "创建文件成功", "")
+// 重命名
+func (this *File) Rename(ctx echo.Context) error {
+    oldName := ctx.FormValue("old_name")
+    if oldName == "" {
+        return response.ReturnErrorJson(ctx, "旧名称不能为空")
+    }
+
+    newName := ctx.FormValue("new_name")
+    if newName == "" {
+        return response.ReturnErrorJson(ctx, "新名称不能为空")
+    }
+
+    rootPath := global.Conf.File.Path
+    filePath, _ := fs.Filesystem.Realpath(rootPath)
+
+    oldName = fs.JoinPath(filePath, oldName)
+    newName = fs.JoinPath(filePath, newName)
+
+    if !fs.Exists(oldName) {
+        return response.ReturnErrorJson(ctx, "旧名称不存在")
+    }
+
+    if fs.Exists(newName) {
+        return response.ReturnErrorJson(ctx, "新名称已经存在")
+    }
+
+    if err := fs.Filesystem.Move(oldName, newName); err != nil {
+        return response.ReturnErrorJson(ctx, "重命名失败")
+    }
+
+    return response.ReturnSuccessJson(ctx, "重命名成功", "")
 }
 
-// 重命名文件
-func (this *File) RenameFile(ctx echo.Context) error {
-    return response.ReturnSuccessJson(ctx, "重命名文件成功", "")
+// 创建文件
+func (this *File) CreateFile(ctx echo.Context) error {
+    file := ctx.FormValue("file")
+    if file == "" {
+        return response.ReturnErrorJson(ctx, "文件不能为空")
+    }
+
+    rootPath := global.Conf.File.Path
+    filePath, _ := fs.Filesystem.Realpath(rootPath)
+
+    file = fs.JoinPath(filePath, file)
+
+    if fs.IsFile(file) {
+        return response.ReturnErrorJson(ctx, "文件已经存在")
+    }
+
+    if err := fs.Filesystem.Touch(file); err != nil {
+        return response.ReturnErrorJson(ctx, "创建文件失败")
+    }
+
+    return response.ReturnSuccessJson(ctx, "创建文件成功", "")
 }
 
 // 更新文件
@@ -231,21 +277,90 @@ func (this *File) DownloadFile(ctx echo.Context) error {
 
 // 移动文件
 func (this *File) MoveFile(ctx echo.Context) error {
+    oldName := ctx.FormValue("old_name")
+    if oldName == "" {
+        return response.ReturnErrorJson(ctx, "旧名称不能为空")
+    }
+
+    newName := ctx.FormValue("new_name")
+    if newName == "" {
+        return response.ReturnErrorJson(ctx, "新名称不能为空")
+    }
+
+    rootPath := global.Conf.File.Path
+    filePath, _ := fs.Filesystem.Realpath(rootPath)
+
+    oldName = fs.JoinPath(filePath, oldName)
+    newName = fs.JoinPath(filePath, newName)
+
+    if !fs.IsFile(oldName) {
+        return response.String(ctx, "旧文件不存在")
+    }
+
+    if fs.IsFile(newName) {
+        return response.String(ctx, "新文件已经存在")
+    }
+
+    if err := fs.Filesystem.Move(oldName, newName); err != nil {
+        return response.ReturnErrorJson(ctx, "移动文件失败")
+    }
+
     return response.ReturnSuccessJson(ctx, "移动文件成功", "")
 }
 
 // 创建文件夹
-func (this *File) MakeDir(ctx echo.Context) error {
+func (this *File) CreateDir(ctx echo.Context) error {
+    dir := ctx.FormValue("dir")
+    if dir == "" {
+        return response.ReturnErrorJson(ctx, "文件夹不能为空")
+    }
+
+    rootPath := global.Conf.File.Path
+    rootPath, _ = fs.Filesystem.Realpath(rootPath)
+
+    dir = fs.JoinPath(rootPath, dir)
+
+    if fs.Filesystem.IsDirectory(dir) {
+        return response.String(ctx, "文件夹已经存在")
+    }
+
+    if err := fs.Filesystem.MakeDirectory(dir, 0640, true); err != nil {
+        return response.ReturnErrorJson(ctx, "创建文件夹失败")
+    }
+
     return response.ReturnSuccessJson(ctx, "创建文件夹成功", "")
 }
 
 // 移动文件夹
 func (this *File) MoveDir(ctx echo.Context) error {
-    return response.ReturnSuccessJson(ctx, "移动文件夹成功", "")
-}
+    oldDir := ctx.FormValue("old_dir")
+    if oldDir == "" {
+        return response.ReturnErrorJson(ctx, "旧文件夹不能为空")
+    }
 
-// 重命名文件夹
-func (this *File) RenameDir(ctx echo.Context) error {
-    return response.ReturnSuccessJson(ctx, "重命名文件夹成功", "")
+    newDir := ctx.FormValue("new_dir")
+    if newDir == "" {
+        return response.ReturnErrorJson(ctx, "新文件夹不能为空")
+    }
+
+    rootPath := global.Conf.File.Path
+    rootPath, _ = fs.Filesystem.Realpath(rootPath)
+
+    oldDir = fs.JoinPath(rootPath, oldDir)
+    newDir = fs.JoinPath(rootPath, newDir)
+
+    if !fs.Filesystem.IsDirectory(oldDir) {
+        return response.ReturnErrorJson(ctx, "旧文件夹不存在")
+    }
+
+    if fs.Filesystem.IsDirectory(newDir) {
+        return response.ReturnErrorJson(ctx, "新文件夹已经存在")
+    }
+
+    if err := fs.Filesystem.MoveDirectory(oldDir, newDir, true); err != nil {
+        return response.ReturnErrorJson(ctx, "移动文件失败")
+    }
+
+    return response.ReturnSuccessJson(ctx, "移动文件夹成功", "")
 }
 
