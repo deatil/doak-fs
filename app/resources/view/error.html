@@ -1,0 +1,27 @@
+{% extends "common/base.html" %}
+
+{% block title %}错误 - {{ block.Super }}{% endblock %}
+
+{% block content %}
+<div class="row" style="opacity: 1;">
+    <div class="col-lg-12">
+        <div id="error-box">
+            <div class="row">
+                <div class="col-xs-12" style="min-height: 900px;">
+                    <div id="error-box-inner">
+                        <img src='{{ assets("image/error-404-v2.png") }}' alt="页面已经丢失">
+                    </div>
+                    <h1>ERROR 404</h1>
+                    <p>
+                        页面不存在<br>
+                        如果你发现了这个情况，请告诉我们。
+                    </p>
+                    <p>
+                        返回 <a href="/">首页</a>。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

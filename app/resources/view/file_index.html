@@ -36,6 +36,9 @@
                             <a href="javascript:;" class="btn btn-primary pull-right js-create-file-btn">
                                 <i class="fa fa-plus-circle fa-lg"></i> 创建文件
                             </a>
+                            <a href="javascript:;" class="btn btn-warning pull-right js-upload-btn" data-path="{{ path }}">
+                                <i class="fa fa-upload fa-lg"></i> 上传文件
+                            </a>
                         </div>
                     </header>
 
@@ -99,7 +102,7 @@
                                             <td>
                                                 {{ item.perm }}
                                             </td>
-                                            <td style="width: 22%;">
+                                            <td style="width: 15%;">
                                                 <a href="javascript:;"
                                                     class="table-link js-info-btn"
                                                     data-file="{{ path }}/{{ item.namesmall }}"
@@ -130,6 +133,17 @@
                                                         </span>
                                                     </a>
                                                 {% endif %}
+                                                
+                                                <a href="javascript:;"
+                                                    class="table-link js-move-btn"
+                                                    data-file="{{ path }}/{{ item.namesmall }}"
+                                                    data-name="{{ item.namesmall }}"
+                                                    title="移动">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa fa-exchange fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
                                                 
                                                 <a href="javascript:;"
                                                     class="table-link js-rename-btn"
@@ -219,14 +233,14 @@
         });
     });
 
-    // 更新
+    // 编辑文件
     $('.js-update-btn').click(function(e) {
         var file = $(this).data("file");
         var href = '/file/update-file?file=' + file;
 
         layer.open({
             type: 2,
-            title: '详情',
+            title: '编辑文件',
             shadeClose: true,
             shade: 0.2,
             area: ['80%', '86%'],
@@ -246,8 +260,7 @@
     $(".js-create-dir-btn").click(function() {
         var content = '';
 
-        content += '<div style="padding: 10px 20px 0 20px;">文件夹名称</div>';
-        content += '<div style="padding: 5px 20px 10px 20px;"><input type="text" class="form-control" id="newDirName" placeholder="文件夹名称" value="new-dir"></div>';
+        content += '<div style="padding: 25px 20px 10px 20px;"><input type="text" class="form-control" id="newDirName" placeholder="文件夹名称" value="new-dir"></div>';
         content += '<div style="padding: 5px 20px 10px 20px;"><button type="button" class="btn btn-success pull-right js-create-dir-save-btn">确认</button></div>';
 
         layer.open({
@@ -290,8 +303,7 @@
     $(".js-create-file-btn").click(function() {
         var content = '';
 
-        content += '<div style="padding: 10px 20px 0 20px;">文件名称</div>';
-        content += '<div style="padding: 5px 20px 10px 20px;"><input type="text" class="form-control" id="newFileName" placeholder="文件名称" value="new-file.txt"></div>';
+        content += '<div style="padding: 25px 20px 10px 20px;"><input type="text" class="form-control" id="newFileName" placeholder="文件名称" value="new-file.txt"></div>';
         content += '<div style="padding: 5px 20px 10px 20px;"><button type="button" class="btn btn-success pull-right js-create-file-save-btn">确认</button></div>';
 
         layer.open({
@@ -335,8 +347,7 @@
         var oldName = $(this).data('name');
         var content = '';
 
-        content += '<div style="padding: 10px 20px 0 20px;">重命名</div>';
-        content += '<div style="padding: 5px 20px 10px 20px;"><input type="text" class="form-control" id="newRenameName" data-name="' + oldName + '" placeholder="新名称" value="' + oldName + '"></div>';
+        content += '<div style="padding: 25px 20px 10px 20px;"><input type="text" class="form-control" id="newRenameName" data-name="' + oldName + '" placeholder="新名称" value="' + oldName + '"></div>';
         content += '<div style="padding: 5px 20px 10px 20px;"><button type="button" class="btn btn-success pull-right js-rename-save-btn">确认</button></div>';
 
         layer.open({
@@ -376,6 +387,36 @@
                     icon: 2
                 });
             }
+        });
+    });
+
+    // 移动
+    $('.js-move-btn').click(function(e) {
+        var file = $(this).data("file");
+        var href = '/file/move?old=' + file;
+
+        layer.open({
+            type: 2,
+            title: '移动',
+            shadeClose: true,
+            shade: 0.2,
+            area: ['80%', '86%'],
+            content: href,
+        });
+    });
+
+    // 上传
+    $('.js-upload-btn').click(function(e) {
+        var path = $(this).data("path");
+        var href = '/file/upload?path=' + path;
+
+        layer.open({
+            type: 2,
+            title: '上传',
+            shadeClose: true,
+            shade: 0.2,
+            area: ['70%', '86%'],
+            content: href,
         });
     });
 

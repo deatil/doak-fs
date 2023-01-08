@@ -137,9 +137,10 @@ func Start() {
                 }
 
                 // 显示请求信息
-                requestData := fmt.Sprintf("[doak-fs] %s | %3d | %-15s | %-7s | %s | %#v",
+                requestData := fmt.Sprintf("[doak-fs] %s | %3d | %15s | %-15s | %-7s | %s | %#v",
                     values.StartTime.Format("2006-01-02 15:04:05"),
                     values.Status,
+                    values.Latency,
                     ctx.RealIP(),
                     req.Method,
                     values.URI,

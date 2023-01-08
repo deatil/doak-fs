@@ -3,7 +3,6 @@ package fs
 import (
     "fmt"
     "regexp"
-    "strconv"
 
     "github.com/deatil/lakego-filesystem/filesystem"
 
@@ -45,6 +44,16 @@ func Ls(directory string) []map[string]any {
     return res
 }
 
+// 列出文件夹
+func LsDir(directory string) []map[string]any {
+    res := make([]map[string]any, 0)
+
+    directories, _ := Filesystem.Directories(directory)
+    res = append(res, formatDirectories(directories, directory)...)
+
+    return res
+}
+
 // 详情
 func Read(path string) map[string]any {
     size := "-"
@@ -74,7 +83,7 @@ func Read(path string) map[string]any {
         "type":      typ,
         "ext":       ext,
         "perm":      perm,
-        "permInt":   strconv.FormatUint(uint64(permInt), 10),
+        "permInt":   fmt.Sprintf("%o", permInt),
     }
 
     return res
@@ -147,7 +156,7 @@ func formatFiles(files []string, path string) []map[string]any {
             "type":      detectFileType(file),
             "ext":       Filesystem.Extension(file),
             "perm":      perm,
-            "permInt":   strconv.FormatUint(uint64(permInt), 10),
+            "permInt":   fmt.Sprintf("%o", permInt),
         })
     }
 
@@ -173,7 +182,7 @@ func formatDirectories(dirs []string, path string) []map[string]any {
             "type":      "dir",
             "ext":       "",
             "perm":      perm,
-            "permInt":   strconv.FormatUint(uint64(permInt), 10),
+            "permInt":   fmt.Sprintf("%o", permInt),
         })
     }
 

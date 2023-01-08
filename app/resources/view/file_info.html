@@ -17,7 +17,7 @@
     }
 }
 .sys-name {
-    width: 180px !important;
+    width: 160px !important;
 }
 </style>
 
@@ -40,18 +40,6 @@
                         </td>
                         <td class="sys-content">
                             {{ file }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sys-name">
-                            是否文件夹
-                        </td>
-                        <td class="sys-content">
-                            {% if data.isDir %}
-                                <span class="label label-success">是</span>
-                            {% else %}
-                                <span class="label label-default">否</span>
-                            {% endif %}
                         </td>
                     </tr>
                     <tr>
@@ -92,6 +80,18 @@
                         </td>
                         <td class="sys-content">
                             {{ data.permInt }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="sys-name">
+                            是否文件夹
+                        </td>
+                        <td class="sys-content">
+                            {% if data.isDir %}
+                                <span class="label label-success">是</span>
+                            {% else %}
+                                <span class="label label-default">否</span>
+                            {% endif %}
                         </td>
                     </tr>
                 </tbody>

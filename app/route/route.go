@@ -27,16 +27,17 @@ func Route(e *echo.Echo) {
         fileGroup.GET("/info", fileController.Info)
         fileGroup.POST("/delete", fileController.Delete)
         fileGroup.POST("/rename", fileController.Rename)
+        fileGroup.GET("/move", fileController.Move)
+        fileGroup.POST("/move", fileController.MoveSave)
+        fileGroup.GET("/upload", fileController.Upload)
+        fileGroup.POST("/upload", fileController.UploadSave)
 
         fileGroup.POST("/create-file", fileController.CreateFile)
         fileGroup.GET("/update-file", fileController.UpdateFile)
         fileGroup.POST("/update-file", fileController.UpdateFileSave)
-        fileGroup.POST("/upload-file", fileController.UploadFile)
         fileGroup.GET("/download-file", fileController.DownloadFile)
-        fileGroup.POST("/move-file", fileController.MoveFile)
 
         fileGroup.POST("/create-dir", fileController.CreateDir)
-        fileGroup.POST("/move-dir", fileController.MoveDir)
     }
 }
 

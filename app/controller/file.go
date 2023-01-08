@@ -7,6 +7,7 @@ import (
     "github.com/labstack/echo/v4"
 
     "github.com/deatil/doak-fs/pkg/fs"
+    "github.com/deatil/doak-fs/pkg/utils"
     "github.com/deatil/doak-fs/pkg/global"
     "github.com/deatil/doak-fs/pkg/response"
 )
@@ -33,6 +34,10 @@ func (this *File) Index(ctx echo.Context) error {
         filePath = fs.JoinPath(filePath, path)
     }
 
+    if !utils.CheckFilePath(filePath) {
+        return this.Error(ctx, "访问错误")
+    }
+
     list := fs.Ls(filePath)
     name := fs.Basename(filePath)
 
@@ -53,7 +58,6 @@ func (this *File) Index(ctx echo.Context) error {
     return response.Render(ctx, "file_index.html", map[string]any{
         "path": path,
         "name": name,
-        "filePath": filePath,
         "parentPath": parentPath,
         "list": list,
 
@@ -65,13 +69,17 @@ func (this *File) Index(ctx echo.Context) error {
 func (this *File) Info(ctx echo.Context) error {
     file := ctx.FormValue("file")
     if file == "" {
-        return response.ReturnErrorJson(ctx, "文件不能为空")
+        return response.String(ctx, "文件不能为空")
     }
 
     rootPath := global.Conf.File.Path
     filePath, _ := fs.Filesystem.Realpath(rootPath)
 
     filePath = fs.JoinPath(filePath, file)
+
+    if !utils.CheckFilePath(filePath) {
+        return response.String(ctx, "访问错误")
+    }
 
     data := fs.Read(filePath)
 
@@ -92,6 +100,10 @@ func (this *File) Delete(ctx echo.Context) error {
     filePath, _ := fs.Filesystem.Realpath(rootPath)
 
     filePath = fs.JoinPath(filePath, file)
+
+    if !utils.CheckFilePath(filePath) {
+        return response.ReturnErrorJson(ctx, "访问错误")
+    }
 
     if err := fs.Delete(filePath); err != nil {
         return response.ReturnErrorJson(ctx, "删除文件失败")
@@ -126,11 +138,98 @@ func (this *File) Rename(ctx echo.Context) error {
         return response.ReturnErrorJson(ctx, "新名称已经存在")
     }
 
+    if !utils.CheckFilePath(oldName) || !utils.CheckFilePath(newName) {
+        return response.ReturnErrorJson(ctx, "访问错误")
+    }
+
     if err := fs.Filesystem.Move(oldName, newName); err != nil {
         return response.ReturnErrorJson(ctx, "重命名失败")
     }
 
     return response.ReturnSuccessJson(ctx, "重命名成功", "")
+}
+
+// 移动
+func (this *File) Move(ctx echo.Context) error {
+    old := ctx.FormValue("old")
+    if old == "" {
+        return response.String(ctx, "访问错误")
+    }
+
+    path := ctx.QueryParam("path")
+
+    // 根目录
+    rootPath := global.Conf.File.Path
+    filePath, _ := fs.Filesystem.Realpath(rootPath)
+
+    if path != "" {
+        filePath = fs.JoinPath(filePath, path)
+    }
+
+    if !utils.CheckFilePath(filePath) {
+        return response.String(ctx, "访问错误")
+    }
+
+    list := fs.LsDir(filePath)
+
+    parentPath := ""
+
+    if path == "" || path == "/" {
+        path = ""
+    }
+
+    if path != "" {
+        parentPath = fs.Filesystem.Dirname(path)
+        parentPath = fs.Filesystem.ToSlash(parentPath)
+    }
+
+    return response.Render(ctx, "file_move.html", map[string]any{
+        "old": old,
+        "path": path,
+        "parentPath": parentPath,
+        "list": list,
+    })
+}
+
+// 移动保存
+func (this *File) MoveSave(ctx echo.Context) error {
+    oldName := ctx.FormValue("old_name")
+    if oldName == "" {
+        return response.ReturnErrorJson(ctx, "旧名称不能为空")
+    }
+
+    newName := ctx.FormValue("new_name")
+    if newName == "" {
+        return response.ReturnErrorJson(ctx, "新名称不能为空")
+    }
+
+    rootPath := global.Conf.File.Path
+    filePath, _ := fs.Filesystem.Realpath(rootPath)
+
+    // 名称
+    oldBasename := fs.Basename(oldName)
+
+    oldName = fs.JoinPath(filePath, oldName)
+    newName = fs.JoinPath(filePath, newName)
+    newName = fs.JoinPath(newName, oldBasename)
+
+    if !fs.Exists(oldName) {
+        return response.ReturnErrorJson(ctx, "旧文件不存在")
+    }
+
+    if fs.Exists(newName) {
+        return response.ReturnErrorJson(ctx, "新文件已经存在")
+    }
+
+    if !utils.CheckFilePath(oldName) || !utils.CheckFilePath(newName) {
+        return response.ReturnErrorJson(ctx, "访问错误")
+    }
+
+    if err := fs.Filesystem.Move(oldName, newName); err != nil {
+        return response.ReturnErrorJson(ctx, "移动文件失败")
+    }
+
+    return response.ReturnSuccessJson(ctx, "移动文件成功", "")
 }
 
 // 创建文件
@@ -144,6 +243,10 @@ func (this *File) CreateFile(ctx echo.Context) error {
     filePath, _ := fs.Filesystem.Realpath(rootPath)
 
     file = fs.JoinPath(filePath, file)
+
+    if !utils.CheckFilePath(file) {
+        return response.ReturnErrorJson(ctx, "访问错误")
+    }
 
     if fs.IsFile(file) {
         return response.ReturnErrorJson(ctx, "文件已经存在")
@@ -167,6 +270,10 @@ func (this *File) UpdateFile(ctx echo.Context) error {
     filePath, _ := fs.Filesystem.Realpath(rootPath)
 
     filePath = fs.JoinPath(filePath, file)
+
+    if !utils.CheckFilePath(filePath) {
+        return response.String(ctx, "访问错误")
+    }
 
     if !fs.IsFile(filePath) {
         return response.String(ctx, "打开的不是文件")
@@ -203,6 +310,10 @@ func (this *File) UpdateFileSave(ctx echo.Context) error {
 
     filePath = fs.JoinPath(filePath, file)
 
+    if !utils.CheckFilePath(filePath) {
+        return response.ReturnErrorJson(ctx, "访问错误")
+    }
+
     if !fs.IsFile(filePath) {
         return response.ReturnErrorJson(ctx, "要更新的不是文件")
     }
@@ -215,7 +326,19 @@ func (this *File) UpdateFileSave(ctx echo.Context) error {
 }
 
 // 上传文件
-func (this *File) UploadFile(ctx echo.Context) error {
+func (this *File) Upload(ctx echo.Context) error {
+    path := ctx.FormValue("path")
+    if path == "" {
+        return response.String(ctx, "访问错误")
+    }
+
+    return response.Render(ctx, "file_upload.html", map[string]any{
+        "path": path,
+    })
+}
+
+// 上传文件保存
+func (this *File) UploadSave(ctx echo.Context) error {
     file, err := ctx.FormFile("file")
     if err != nil {
         return err
@@ -228,7 +351,7 @@ func (this *File) UploadFile(ctx echo.Context) error {
     defer src.Close()
 
     // 路径
-    path := ctx.QueryParam("path")
+    path := ctx.FormValue("path")
     if path == "" {
         return response.ReturnErrorJson(ctx, "保存路径不能为空")
     }
@@ -238,6 +361,14 @@ func (this *File) UploadFile(ctx echo.Context) error {
     filePath, _ := fs.Filesystem.Realpath(rootPath)
 
     filename := fs.JoinPath(filePath, path, file.Filename)
+
+    if !utils.CheckFilePath(filename) {
+        return response.ReturnErrorJson(ctx, "访问错误")
+    }
+
+    if fs.Exists(filename) {
+        return response.ReturnErrorJson(ctx, "文件已经存在")
+    }
 
     // 创建文件
     dst, err := os.Create(filename)
@@ -266,6 +397,10 @@ func (this *File) DownloadFile(ctx echo.Context) error {
 
     filePath = fs.JoinPath(filePath, file)
 
+    if !utils.CheckFilePath(filePath) {
+        return response.String(ctx, "访问错误")
+    }
+
     if !fs.IsFile(filePath) {
         return response.String(ctx, "打开的不是文件")
     }
@@ -273,39 +408,6 @@ func (this *File) DownloadFile(ctx echo.Context) error {
     basename := fs.Filesystem.Basename(filePath)
 
     return response.Attachment(ctx, filePath, basename)
-}
-
-// 移动文件
-func (this *File) MoveFile(ctx echo.Context) error {
-    oldName := ctx.FormValue("old_name")
-    if oldName == "" {
-        return response.ReturnErrorJson(ctx, "旧名称不能为空")
-    }
-
-    newName := ctx.FormValue("new_name")
-    if newName == "" {
-        return response.ReturnErrorJson(ctx, "新名称不能为空")
-    }
-
-    rootPath := global.Conf.File.Path
-    filePath, _ := fs.Filesystem.Realpath(rootPath)
-
-    oldName = fs.JoinPath(filePath, oldName)
-    newName = fs.JoinPath(filePath, newName)
-
-    if !fs.IsFile(oldName) {
-        return response.String(ctx, "旧文件不存在")
-    }
-
-    if fs.IsFile(newName) {
-        return response.String(ctx, "新文件已经存在")
-    }
-
-    if err := fs.Filesystem.Move(oldName, newName); err != nil {
-        return response.ReturnErrorJson(ctx, "移动文件失败")
-    }
-
-    return response.ReturnSuccessJson(ctx, "移动文件成功", "")
 }
 
 // 创建文件夹
@@ -320,8 +422,12 @@ func (this *File) CreateDir(ctx echo.Context) error {
 
     dir = fs.JoinPath(rootPath, dir)
 
+    if !utils.CheckFilePath(dir) {
+        return response.ReturnErrorJson(ctx, "访问错误")
+    }
+
     if fs.Filesystem.IsDirectory(dir) {
-        return response.String(ctx, "文件夹已经存在")
+        return response.ReturnErrorJson(ctx, "文件夹已经存在")
     }
 
     if err := fs.Filesystem.MakeDirectory(dir, 0640, true); err != nil {
@@ -329,38 +435,5 @@ func (this *File) CreateDir(ctx echo.Context) error {
     }
 
     return response.ReturnSuccessJson(ctx, "创建文件夹成功", "")
-}
-
-// 移动文件夹
-func (this *File) MoveDir(ctx echo.Context) error {
-    oldDir := ctx.FormValue("old_dir")
-    if oldDir == "" {
-        return response.ReturnErrorJson(ctx, "旧文件夹不能为空")
-    }
-
-    newDir := ctx.FormValue("new_dir")
-    if newDir == "" {
-        return response.ReturnErrorJson(ctx, "新文件夹不能为空")
-    }
-
-    rootPath := global.Conf.File.Path
-    rootPath, _ = fs.Filesystem.Realpath(rootPath)
-
-    oldDir = fs.JoinPath(rootPath, oldDir)
-    newDir = fs.JoinPath(rootPath, newDir)
-
-    if !fs.Filesystem.IsDirectory(oldDir) {
-        return response.ReturnErrorJson(ctx, "旧文件夹不存在")
-    }
-
-    if fs.Filesystem.IsDirectory(newDir) {
-        return response.ReturnErrorJson(ctx, "新文件夹已经存在")
-    }
-
-    if err := fs.Filesystem.MoveDirectory(oldDir, newDir, true); err != nil {
-        return response.ReturnErrorJson(ctx, "移动文件失败")
-    }
-
-    return response.ReturnSuccessJson(ctx, "移动文件夹成功", "")
 }
 
