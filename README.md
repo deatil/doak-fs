@@ -43,6 +43,8 @@ go run main.go --config=config.toml
 go run main.go --view=template
 ```
 
+3. 登录账号: `admin` / `123456`
+
 
 ### 特别鸣谢
 
