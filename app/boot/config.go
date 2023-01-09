@@ -15,7 +15,7 @@ func initConfig() {
     defaultConf, _ := resources.ReadConfig("config/config.toml")
 
     // 配置
-    if global.ConfigFile != "" {
+    if global.ConfigFile != "" && !global.IsOnlyEmbed {
         defaultConfFile = global.ConfigFile
 
         // 检测

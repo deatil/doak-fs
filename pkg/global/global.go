@@ -17,3 +17,6 @@ var ConfigFile string
 
 // 模板位置
 var ViewPath string
+
+// 是否只使用打包文件
+var IsOnlyEmbed bool

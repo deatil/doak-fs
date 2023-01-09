@@ -31,6 +31,9 @@ func init() {
     global.ConfigFile = *config
     global.ViewPath = *view
 
+    // 只使用打包文件
+    global.IsOnlyEmbed = true
+
     initConfig()
 
     initTime()
@@ -176,7 +179,7 @@ func Start() {
     renderer.SetDebug(debug)
     renderer.AddFuncs(view.ViewFuncs())
 
-    if global.ViewPath != "" {
+    if global.ViewPath != "" && !global.IsOnlyEmbed {
         renderer.SetUseEmbed(false)
         renderer.AddDirectory(global.ViewPath)
     } else {
