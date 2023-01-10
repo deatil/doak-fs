@@ -329,7 +329,7 @@ func (this *File) UpdateFileSave(ctx echo.Context) error {
 func (this *File) Upload(ctx echo.Context) error {
     path := ctx.FormValue("path")
     if path == "" {
-        return response.String(ctx, "访问错误")
+        path = "/"
     }
 
     return response.Render(ctx, "file_upload.html", map[string]any{

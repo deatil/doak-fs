@@ -39,6 +39,9 @@
                             <a href="javascript:;" class="btn btn-warning pull-right js-upload-btn" data-path="{{ path }}">
                                 <i class="fa fa-upload fa-lg"></i> 上传文件
                             </a>
+                            <a href="javascript:;" class="btn btn-info pull-right js-refresh-btn">
+                                <i class="fa fa-refresh fa-lg"></i> 刷新
+                            </a>
                         </div>
                     </header>
 
@@ -418,6 +421,11 @@
             area: ['70%', '86%'],
             content: href,
         });
+    });
+
+    // 刷新
+    $('.js-refresh-btn').click(function(e) {
+        location.reload();
     });
 
 })(jQuery);
