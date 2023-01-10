@@ -1,13 +1,13 @@
 ## doak-fs 文件管理
 
-文件管理工具，web界面，使用 web 框架 `echo` ，打包静态文件和模板文件，生成一个执行文件部署方便，也可以设置参数自定义配置文件和模板目录
+文件管理工具，web界面，使用 web 框架 `echo` ，打包配置文件、静态文件和模板文件，生成一个执行文件部署方便，也可以设置参数自定义配置文件和模板目录
 
 
 ### 项目介绍
 
 *  使用 `go` 开发的文件管理工具
-*  web 框架使用 `go` 框架 `echo` 
-*  默认打包静态文件和模板文件
+*  web 框架使用 `go` 框架 `echo`
+*  默认打包配置文件、静态文件和模板文件。可更改 `app/boot/boot.go` 文件内 `global.IsOnlyEmbed` 为 `false` 自定义配置文件和模板文件
 *  模板库使用 `pongo2` 库，语法接近 `python` 的 `django` 框架
 *  生成一个文件即可部署
 
@@ -57,7 +57,7 @@ go run main.go --view=template
  - github.com/jinzhu/now
 
  - github.com/deatil/lakego-filesystem
- 
+
  - github.com/steambap/captcha
 
 
