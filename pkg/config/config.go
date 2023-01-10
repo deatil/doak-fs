@@ -19,6 +19,8 @@ type App struct {
     Version  string `toml:"version"`
     Debug    bool   `toml:"debug"`
     TimeZone string `toml:"time_zone"`
+    LogFile  string `toml:"log_file"`
+    LogLevel string `toml:"log_level"`
     Assets   string `toml:"assets"`
 }
 

@@ -3,6 +3,8 @@ app_name = "doak-fs"
 version = "1.0.1"
 debug = true
 time_zone = "Asia/Hong_Kong"
+log_file = "./fs-log.log"
+log_level = "error"
 assets = "/static"
 
 [server]

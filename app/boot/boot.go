@@ -44,6 +44,10 @@ func Start() {
     // 初始化 echo
     e := echo.New()
 
+    // 设置日志信息
+    logger.SetLoggerFile(global.Conf.App.LogFile)
+    logger.SetLoggerLevel(global.Conf.App.LogLevel)
+
     // 自定义错误处理
     e.HTTPErrorHandler = HTTPErrorHandler
 
