@@ -19,6 +19,14 @@ func Route(e *echo.Echo) {
     e.POST("/auth/login", authController.LoginCheck)
     e.GET("/auth/logout", authController.Logout)
 
+    // 我的信息
+    profileGroup := e.Group("/profile", middleware.Auth())
+    {
+        profileController := new(controller.Profile)
+        profileGroup.GET("/password", profileController.Password)
+        profileGroup.POST("/password", profileController.PasswordSave)
+    }
+
     // 文件管理
     fileGroup := e.Group("/file", middleware.Auth())
     {

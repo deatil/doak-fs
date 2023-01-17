@@ -1,29 +1,29 @@
 [app]
-app_name = "doak-fs"
-version = "1.0.1"
+app_name = 'doak-fs'
+version = '1.0.2'
 debug = true
-time_zone = "Asia/Hong_Kong"
-log_file = "./fs-log.log"
-log_level = "error"
-assets = "/static"
+time_zone = 'Asia/Hong_Kong'
+log_file = './fs-log.log'
+log_level = 'error'
+assets = '/static'
 
 [server]
-address = ":1323"
+address = ':1323'
 csrf_token_length = 32
-csrf_context_key = "fs_csrf"
-csrf_cookie_name = "_fs_csrf"
-csrf_cookie_path = "/"
+csrf_context_key = 'fs_csrf'
+csrf_cookie_name = '_fs_csrf'
+csrf_cookie_path = '/'
 csrf_cookie_maxage = 86400
 
 [file]
-path = "./"
+path = './'
 
 [user]
-names = ["admin:$2a$10$zhjk7PnTEHTAV2KPriZMhOR9ZEyzxzNykTBV/eYYQgT0Ca8vG.oAW"]
+names = ['admin:$2a$10$EnHCul2nbg0ZmvL0OEdoOOC4hkzniHO8zFS/vlGVSKYGlMX53qZNu']
 
 [session]
-secret = "secret"
-key = "session"
-path = "/"
+secret = 'secret'
+key = 'session'
+path = '/'
 max_age = 604800 # 86400 * 7
 http_only = true

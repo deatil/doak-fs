@@ -2,6 +2,8 @@ package config
 
 import (
     "os"
+    "fmt"
+    "strings"
 
     "github.com/pelletier/go-toml/v2"
 )
@@ -41,6 +43,48 @@ type User struct {
     Names []string `toml:"names"`
 }
 
+// 更改密码
+func (this User) GetUsers() map[string]string {
+    users := make(map[string]string)
+
+    for _, name := range this.Names {
+        newName := strings.SplitN(name, ":", 2)
+        users[newName[0]] = newName[1]
+    }
+
+    return users
+}
+
+// 账号密码
+func (this User) GetUserPassword(name string) string {
+    users := this.GetUsers()
+
+    if password, ok := users[name]; ok {
+        return password
+    }
+
+    return ""
+}
+
+// 更改密码
+func (this User) UpdatePassword(name string, pass string) User {
+    users := this.GetUsers()
+
+    _, ok := users[name]
+    if !ok {
+        return this
+    }
+
+    users[name] = pass
+
+    this.Names = make([]string, 0)
+    for name, pass := range users {
+        this.Names = append(this.Names, fmt.Sprintf("%s:%s", name, pass))
+    }
+
+    return this
+}
+
 type Session struct {
     Secret   string `toml:"secret"`
     Key      string `toml:"key"`
@@ -77,4 +121,24 @@ func ReadConfigByte(data []byte) (Conf, error) {
     }
 
     return conf, nil
+}
+
+// 写入配置文件
+func WriteConfig(file string, cfg Conf) error {
+    b, err := toml.Marshal(cfg)
+    if err != nil {
+        return err
+    }
+
+    err = os.WriteFile(file, b, 0666)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
+// 写入配置文件
+func WriteConfigToByte(cfg Conf) ([]byte, error) {
+    return toml.Marshal(cfg)
 }
