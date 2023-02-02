@@ -346,7 +346,7 @@ func (this *File) UploadSave(ctx echo.Context) error {
 
     src, err := file.Open()
     if err != nil {
-        return err
+        return response.ReturnErrorJson(ctx, "上传文件错误")
     }
     defer src.Close()
 
@@ -373,13 +373,13 @@ func (this *File) UploadSave(ctx echo.Context) error {
     // 创建文件
     dst, err := os.Create(filename)
     if err != nil {
-        return err
+        return response.ReturnErrorJson(ctx, "创建文件没有权限")
     }
     defer dst.Close()
 
     // 保存
     if _, err = io.Copy(dst, src); err != nil {
-        return err
+        return response.ReturnErrorJson(ctx, "上传文件失败")
     }
 
     return response.ReturnSuccessJson(ctx, "上传文件成功", "")
