@@ -8,9 +8,6 @@ import (
     "encoding/base64"
 
     "golang.org/x/crypto/bcrypt"
-
-    "github.com/deatil/doak-fs/pkg/fs"
-    "github.com/deatil/doak-fs/pkg/global"
 )
 
 // 加密
@@ -69,17 +66,4 @@ func RunPath() string {
     absPath, _ := filepath.Abs(path)
 
     return absPath
-}
-
-// 检测路径是否正常
-func CheckFilePath(path string) bool {
-    // 根目录
-    rootPath := global.Conf.File.Path
-    rootPath, _ = fs.Filesystem.Realpath(rootPath)
-
-    if strings.HasPrefix(path, rootPath) {
-        return true
-    }
-
-    return false
 }

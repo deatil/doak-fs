@@ -14,26 +14,19 @@ var Filesystem *filesystem.Filesystem
 
 // 文件类型
 var fileTypes = map[string]string{
-    "image": "png|jpg|jpeg|ico|gif|bmp|svg|wbmp|avif",
-    "xls"  : "xls|xlt|xla|xlsx|xltx|xlsm|xltm|xlam|xlsb",
-    "word" : "doc|docx|dot|dotx|docm|dotm",
-    "ppt"  : "ppt|pptx|pptm",
-    "pdf"  : "pdf",
-    "code" : "php|js|java|python|ruby|go|c|cpp|sql|m|h|json|html|aspx",
-    "zip"  : `zip|tar\.gz|rar|rpm`,
-    "text" : "txt|pac|log|md",
-    "audio": "mp3|wav|flac|3pg|aa|aac|ape|au|m4a|mpc|ogg",
-    "video": "mkv|rmvb|flv|mp4|avi|wmv|rm|asf|mpeg",
-}
-
-// 名称
-func Basename(path string) string {
-    return Filesystem.Basename(path)
-}
-
-// 合并目录
-func JoinPath(elem ...string) string {
-    return Filesystem.Join(elem...)
+    "image"  : "png|jpg|jpeg|ico|gif|bmp|svg|wbmp|avif",
+    "xls"    : "xls|xlt|xla|xlsx|xltx|xlsm|xltm|xlam|xlsb",
+    "word"   : "doc|docx|dot|dotx|docm|dotm",
+    "ppt"    : "ppt|pptx|pptm",
+    "pdf"    : "pdf",
+    "code"   : "php|js|java|python|ruby|rs|v|go|c|cpp|sql|m|h|json|html|aspx",
+    "archive": `zip|tar\.gz|rar|rpm`,
+    "text"   : "txt|pac|log|md",
+    "audio"  : "mp3|wav|flac|3pg|aa|aac|ape|au|m4a|mpc|ogg",
+    "video"  : "mkv|rmvb|flv|mp4|avi|wmv|rm|asf|mpeg",
+    "apk"    : "apk",
+    "exe"    : "exe",
+    "md"     : "md",
 }
 
 // 格式化文件
@@ -78,7 +71,7 @@ func formatDirectories(dirs []string, path string) []map[string]any {
             "isDir":     true,
             "size":      "-",
             "time":      formatTime(Filesystem.LastModified(dir)),
-            "type":      "dir",
+            "type":      "folder",
             "ext":       "",
             "perm":      perm,
             "permInt":   fmt.Sprintf("%o", permInt),
@@ -98,7 +91,7 @@ func detectFileType(file string) string {
         }
     }
 
-    return "other";
+    return "file";
 }
 
 // 格式化时间

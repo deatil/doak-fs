@@ -75,7 +75,9 @@
                                     {% if parentPath != "" %}
                                         <tr>
                                             <td class="sys-name" colspan="7" data-name="{{ parentPath }}">
-                                                <a href="/file/index?path={{ parentPath }}" title="返回上级">..</a>
+                                                <a href="/file/index?path={{ parentPath }}" title="返回上级">
+                                                    ..
+                                                </a>
                                             </td>
                                         </tr>
                                     {% endif %}
@@ -83,6 +85,8 @@
                                     {% for item in list %}
                                         <tr>
                                             <td class="sys-name">
+                                                <i class="{{ faIcon(item.type) }}"></i>
+                                                
                                                 {% if item.isDir %}
                                                     <a href="/file/index?path={{ path }}/{{ item.namesmall }}" title="{{ item.namesmall }}">{{ item.namesmall }}</a>
                                                 {% else %}

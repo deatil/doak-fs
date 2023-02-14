@@ -13,7 +13,9 @@ func initFs() {
 
     switch driverName {
         case "local":
-            driver = fs.NewLocal()
+            rootPath := global.Conf.File.Path
+
+            driver = fs.NewLocal(rootPath)
     }
 
     // 文件管理器

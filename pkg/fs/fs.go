@@ -1,5 +1,9 @@
 package fs
 
+import (
+    "io"
+)
+
 // 接口
 type IFs interface {
     Ls(directory string) []map[string]any
@@ -9,9 +13,18 @@ type IFs interface {
     Exists(path string) bool
     IsFile(path string) bool
     IsDirectory(path string) bool
-    Get(path string, lock ...bool) (string, error)
-    Put(path string, contents string, lock ...bool) error
-    Chmod(path string, mode uint32) error
+    Get(path string) (string, error)
+    Put(path string, contents string) error
+    CreateFile(path string) error
+    CreateDir(path string) error
+    Upload(rd io.Reader, path string, name string) error
+    Rename(oldName string, newName string) error
+    Move(oldName string, newName string) error
+
+    Basename(path string) string
+    ParentPath(path string) string
+    Extension(path string) string
+    FormatFile(path string) (string, error)
 }
 
 func New(driver IFs) Fs {
@@ -58,14 +71,46 @@ func (this Fs) IsDirectory(path string) bool {
     return this.Driver.IsDirectory(path)
 }
 
-func (this Fs) Get(path string, lock ...bool) (string, error) {
-    return this.Driver.Get(path, lock...)
+func (this Fs) Get(path string) (string, error) {
+    return this.Driver.Get(path)
 }
 
-func (this Fs) Put(path string, contents string, lock ...bool) error {
-    return this.Driver.Put(path, contents, lock...)
+func (this Fs) Put(path string, contents string) error {
+    return this.Driver.Put(path, contents)
 }
 
-func (this Fs) Chmod(path string, mode uint32) error {
-    return this.Driver.Chmod(path, mode)
+func (this Fs) CreateFile(path string) error {
+    return this.Driver.CreateFile(path)
+}
+
+func (this Fs) Basename(path string) string {
+    return this.Driver.Basename(path)
+}
+
+func (this Fs) ParentPath(path string) string {
+    return this.Driver.ParentPath(path)
+}
+
+func (this Fs) Extension(path string) string {
+    return this.Driver.Extension(path)
+}
+
+func (this Fs) Upload(src io.Reader, path string, name string) error {
+    return this.Driver.Upload(src, path, name)
+}
+
+func (this Fs) Rename(oldName string, newName string) error {
+    return this.Driver.Rename(oldName, newName)
+}
+
+func (this Fs) Move(oldName string, newName string) error {
+    return this.Driver.Move(oldName, newName)
+}
+
+func (this Fs) FormatFile(path string) (string, error) {
+    return this.Driver.FormatFile(path)
+}
+
+func (this Fs) CreateDir(path string) error {
+    return this.Driver.CreateDir(path)
 }

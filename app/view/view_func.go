@@ -3,6 +3,7 @@ package view
 import (
     "github.com/deatil/doak-fs/app/url"
     "github.com/deatil/doak-fs/pkg/time"
+    "github.com/deatil/doak-fs/pkg/utils"
 )
 
 // 模板方法
@@ -18,6 +19,9 @@ func ViewFuncs() map[string]any {
     funcs["formatTimestamp"] = time.FromTimestamp
     funcs["parseTime"] = time.Parse
     funcs["mustParseTime"] = time.MustParse
+
+    // 图标
+    funcs["faIcon"] = utils.GetFaIcon
 
     return funcs
 }
