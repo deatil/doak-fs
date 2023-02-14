@@ -7,5 +7,8 @@ import (
 
 // 初始化时间
 func initTime() {
+    timezone := global.Conf.App.TimeZone
+    time.SetTimezone(timezone)
+
     global.StartTime = time.Now().ToTime()
 }

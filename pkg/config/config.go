@@ -36,7 +36,8 @@ type Server struct {
 }
 
 type File struct {
-    Path string `toml:"path"`
+    Path   string `toml:"path"`
+    Driver string `toml:"driver"`
 }
 
 type User struct {

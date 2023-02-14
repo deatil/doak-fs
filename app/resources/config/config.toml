@@ -17,6 +17,7 @@ csrf_cookie_maxage = 86400
 
 [file]
 path = './'
+driver = 'local'
 
 [user]
 names = ['admin:$2a$10$EnHCul2nbg0ZmvL0OEdoOOC4hkzniHO8zFS/vlGVSKYGlMX53qZNu']

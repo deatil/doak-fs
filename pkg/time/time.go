@@ -3,8 +3,6 @@ package time
 import (
     "time"
     "github.com/jinzhu/now"
-
-    "github.com/deatil/doak-fs/pkg/global"
 )
 
 var (
@@ -12,6 +10,9 @@ var (
     TimeFormat     = "15:04:05"
     DateTimeFormat = "2006-01-02 15:04:05"
 )
+
+// 时区
+var timezone = "Asia/Hong_Kong"
 
 /**
  * 时间格式化
@@ -71,11 +72,16 @@ func (this Time) ToTimeString() string {
     return this.time.Format(TimeFormat)
 }
 
+// 设置时区
+func SetTimezone(tz string) {
+    timezone = tz
+}
+
 // 来源时间
 func FromTime(t time.Time) Time {
-    loc := timeLoc()
-
-    return Time{now.New(t.In(loc)).Time}
+    return Time{
+        now.New(t.In(timeLoc())).Time,
+    }
 }
 
 // 来源时间
@@ -90,25 +96,20 @@ func Now() Time {
 
 // 解析
 func Parse(str string) Time {
-    loc := timeLoc()
-
-    date, _ := now.ParseInLocation(loc, str)
+    date, _ := now.ParseInLocation(timeLoc(), str)
 
     return Time{date}
 }
 
 // 解析失败后抛出异常
 func MustParse(str string) Time {
-    loc := timeLoc()
-
-    date := now.MustParseInLocation(loc, str)
+    date := now.MustParseInLocation(timeLoc(), str)
 
     return Time{date}
 }
 
 // 时区
 func timeLoc() *time.Location {
-    timezone := global.Conf.App.TimeZone
     loc, _ := time.LoadLocation(timezone)
 
     return loc

@@ -38,7 +38,7 @@ func (this *File) Index(ctx echo.Context) error {
         return this.Error(ctx, "访问错误")
     }
 
-    list := fs.Ls(filePath)
+    list := global.Fs.Ls(filePath)
     name := fs.Basename(filePath)
 
     parentPath := ""
@@ -81,7 +81,7 @@ func (this *File) Info(ctx echo.Context) error {
         return response.String(ctx, "访问错误")
     }
 
-    data := fs.Read(filePath)
+    data := global.Fs.Read(filePath)
 
     return response.Render(ctx, "file_info.html", map[string]any{
         "data": data,
@@ -105,7 +105,7 @@ func (this *File) Delete(ctx echo.Context) error {
         return response.ReturnErrorJson(ctx, "访问错误")
     }
 
-    if err := fs.Delete(filePath); err != nil {
+    if err := global.Fs.Delete(filePath); err != nil {
         return response.ReturnErrorJson(ctx, "删除文件失败")
     }
 
@@ -130,11 +130,11 @@ func (this *File) Rename(ctx echo.Context) error {
     oldName = fs.JoinPath(filePath, oldName)
     newName = fs.JoinPath(filePath, newName)
 
-    if !fs.Exists(oldName) {
+    if !global.Fs.Exists(oldName) {
         return response.ReturnErrorJson(ctx, "旧名称不存在")
     }
 
-    if fs.Exists(newName) {
+    if global.Fs.Exists(newName) {
         return response.ReturnErrorJson(ctx, "新名称已经存在")
     }
 
@@ -170,7 +170,7 @@ func (this *File) Move(ctx echo.Context) error {
         return response.String(ctx, "访问错误")
     }
 
-    list := fs.LsDir(filePath)
+    list := global.Fs.LsDir(filePath)
 
     parentPath := ""
 
@@ -213,11 +213,11 @@ func (this *File) MoveSave(ctx echo.Context) error {
     newName = fs.JoinPath(filePath, newName)
     newName = fs.JoinPath(newName, oldBasename)
 
-    if !fs.Exists(oldName) {
+    if !global.Fs.Exists(oldName) {
         return response.ReturnErrorJson(ctx, "旧文件不存在")
     }
 
-    if fs.Exists(newName) {
+    if global.Fs.Exists(newName) {
         return response.ReturnErrorJson(ctx, "新文件已经存在")
     }
 
@@ -248,7 +248,7 @@ func (this *File) CreateFile(ctx echo.Context) error {
         return response.ReturnErrorJson(ctx, "访问错误")
     }
 
-    if fs.IsFile(file) {
+    if global.Fs.IsFile(file) {
         return response.ReturnErrorJson(ctx, "文件已经存在")
     }
 
@@ -275,11 +275,11 @@ func (this *File) UpdateFile(ctx echo.Context) error {
         return response.String(ctx, "访问错误")
     }
 
-    if !fs.IsFile(filePath) {
+    if !global.Fs.IsFile(filePath) {
         return response.String(ctx, "打开的不是文件")
     }
 
-    data, err := fs.Get(filePath)
+    data, err := global.Fs.Get(filePath)
     if err != nil {
         return response.String(ctx, "打开文件失败")
     }
@@ -314,11 +314,11 @@ func (this *File) UpdateFileSave(ctx echo.Context) error {
         return response.ReturnErrorJson(ctx, "访问错误")
     }
 
-    if !fs.IsFile(filePath) {
+    if !global.Fs.IsFile(filePath) {
         return response.ReturnErrorJson(ctx, "要更新的不是文件")
     }
 
-    if err := fs.Put(filePath, data); err != nil {
+    if err := global.Fs.Put(filePath, data); err != nil {
         return response.ReturnErrorJson(ctx, "更新文件失败")
     }
 
@@ -366,7 +366,7 @@ func (this *File) UploadSave(ctx echo.Context) error {
         return response.ReturnErrorJson(ctx, "访问错误")
     }
 
-    if fs.Exists(filename) {
+    if global.Fs.Exists(filename) {
         return response.ReturnErrorJson(ctx, "文件已经存在")
     }
 
@@ -401,7 +401,7 @@ func (this *File) DownloadFile(ctx echo.Context) error {
         return response.String(ctx, "访问错误")
     }
 
-    if !fs.IsFile(filePath) {
+    if !global.Fs.IsFile(filePath) {
         return response.String(ctx, "打开的不是文件")
     }
 
@@ -426,7 +426,7 @@ func (this *File) CreateDir(ctx echo.Context) error {
         return response.ReturnErrorJson(ctx, "访问错误")
     }
 
-    if fs.Filesystem.IsDirectory(dir) {
+    if global.Fs.IsDirectory(dir) {
         return response.ReturnErrorJson(ctx, "文件夹已经存在")
     }
 

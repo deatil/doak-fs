@@ -37,6 +37,8 @@ func init() {
     initConfig()
 
     initTime()
+
+    initFs()
 }
 
 // 运行

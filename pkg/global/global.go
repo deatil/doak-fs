@@ -3,11 +3,15 @@ package global
 import (
     "time"
 
+    "github.com/deatil/doak-fs/pkg/fs"
     "github.com/deatil/doak-fs/pkg/config"
 )
 
 // 配置信息
 var Conf config.Conf
+
+// 文件管理器
+var Fs fs.Fs
 
 // 启动时间
 var StartTime time.Time
