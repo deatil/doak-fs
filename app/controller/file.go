@@ -66,10 +66,10 @@ func (this *File) Delete(ctx echo.Context) error {
     }
 
     if err := global.Fs.Delete(file); err != nil {
-        return response.ReturnErrorJson(ctx, "删除文件失败")
+        return response.ReturnErrorJson(ctx, "删除失败")
     }
 
-    return response.ReturnSuccessJson(ctx, "删除文件成功", "")
+    return response.ReturnSuccessJson(ctx, "删除成功", "")
 }
 
 // 重命名

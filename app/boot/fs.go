@@ -7,15 +7,14 @@ import (
 
 // 初始化文件管理器
 func initFs() {
-    driverName := global.Conf.File.Driver
+    fs.AddDriver("local", func() fs.IFs {
+        return fs.NewLocal(global.Conf.File.Path)
+    })
 
-    var driver fs.IFs
+    driver := fs.GetDriver(global.Conf.File.Driver)
 
-    switch driverName {
-        case "local":
-            rootPath := global.Conf.File.Path
-
-            driver = fs.NewLocal(rootPath)
+    if driver == nil {
+        panic("fs driver not exists")
     }
 
     // 文件管理器
