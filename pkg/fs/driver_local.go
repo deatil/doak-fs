@@ -8,8 +8,10 @@ import (
     "strings"
 )
 
-func NewLocal(rootPath string) Local {
-    return Local{rootPath}
+func NewDriverLocal(rootPath string) DriverLocal {
+    return DriverLocal{
+        rootPath: rootPath,
+    }
 }
 
 /**
@@ -18,12 +20,15 @@ func NewLocal(rootPath string) Local {
  * @create 2023-2-14
  * @author deatil
  */
-type Local struct {
+type DriverLocal struct {
+    DriverBase
+
+    // 根目录
     rootPath string
 }
 
 // 列出文件及文件夹
-func (this Local) Ls(directory string) []map[string]any {
+func (this DriverLocal) Ls(directory string) []map[string]any {
     res := make([]map[string]any, 0)
 
     directory = this.formatPath(directory)
@@ -42,7 +47,7 @@ func (this Local) Ls(directory string) []map[string]any {
 }
 
 // 列出文件夹
-func (this Local) LsDir(directory string) []map[string]any {
+func (this DriverLocal) LsDir(directory string) []map[string]any {
     res := make([]map[string]any, 0)
 
     directory = this.formatPath(directory)
@@ -58,37 +63,37 @@ func (this Local) LsDir(directory string) []map[string]any {
 }
 
 // 详情
-func (this Local) Read(path string) map[string]any {
+func (this DriverLocal) Read(path string) map[string]any {
     path = this.formatPath(path)
 
     if !this.checkFilePath(path) {
         return make(map[string]any)
     }
 
-    size := "-"
-    typ := ""
-    ext := ""
-    isDir := false
+    size  := "-"
+    typ   := "folder"
+    ext   := ""
+    isDir := true
 
     if Filesystem.IsFile(path) {
-        typ   = detectFileType(path)
-        size  = formatSize(Filesystem.Size(path))
+        typ   = DetectFileType(path)
+        size  = FormatSize(Filesystem.Size(path))
         ext   = Filesystem.Extension(path)
         isDir = false
-    } else {
-        typ   = "folder"
-        isDir = true
     }
 
-    perm, _ := Filesystem.PermString(path)
+    namesmall := Filesystem.Basename(path)
+    time      := Filesystem.LastModified(path)
+
+    perm, _    := Filesystem.PermString(path)
     permInt, _ := Filesystem.Perm(path)
 
     res := map[string]any{
         "name":      path,
-        "namesmall": Filesystem.Basename(path),
+        "namesmall": namesmall,
         "isDir":     isDir,
         "size":      size,
-        "time":      formatTime(Filesystem.LastModified(path)),
+        "time":      FormatTime(time),
         "type":      typ,
         "ext":       ext,
         "perm":      perm,
@@ -99,7 +104,7 @@ func (this Local) Read(path string) map[string]any {
 }
 
 // 删除
-func (this Local) Delete(paths ...string) error {
+func (this DriverLocal) Delete(paths ...string) error {
     for _, path := range paths {
         this.deletePath(path)
     }
@@ -108,7 +113,7 @@ func (this Local) Delete(paths ...string) error {
 }
 
 // 删除
-func (this Local) deletePath(path string) error {
+func (this DriverLocal) deletePath(path string) error {
     path = this.formatPath(path)
 
     if !this.checkFilePath(path) {
@@ -125,7 +130,7 @@ func (this Local) deletePath(path string) error {
 }
 
 // 重命名
-func (this Local) Rename(oldName string, newName string) error {
+func (this DriverLocal) Rename(oldName string, newName string) error {
     oldName = this.formatPath(oldName)
     newName = this.formatPath(newName)
 
@@ -149,7 +154,7 @@ func (this Local) Rename(oldName string, newName string) error {
 }
 
 // 移动
-func (this Local) Move(oldName string, newName string) error {
+func (this DriverLocal) Move(oldName string, newName string) error {
     oldName = this.formatPath(oldName)
 
     oldBasename := this.Basename(oldName)
@@ -180,22 +185,22 @@ func (this Local) Move(oldName string, newName string) error {
 }
 
 // 判断
-func (this Local) Exists(path string) bool {
+func (this DriverLocal) Exists(path string) bool {
     return Filesystem.Exists(path)
 }
 
 // 是否为文件
-func (this Local) IsFile(path string) bool {
+func (this DriverLocal) IsFile(path string) bool {
     return Filesystem.IsFile(path)
 }
 
 // 是否为文件夹
-func (this Local) IsDirectory(path string) bool {
+func (this DriverLocal) IsDirectory(path string) bool {
     return Filesystem.IsDirectory(path)
 }
 
 // 获取
-func (this Local) Get(path string) (string, error) {
+func (this DriverLocal) Get(path string) (string, error) {
     path = this.formatPath(path)
 
     if !this.checkFilePath(path) {
@@ -215,7 +220,7 @@ func (this Local) Get(path string) (string, error) {
 }
 
 // 覆盖
-func (this Local) Put(path string, contents string) error {
+func (this DriverLocal) Put(path string, contents string) error {
     path = this.formatPath(path)
 
     if !this.checkFilePath(path) {
@@ -235,7 +240,7 @@ func (this Local) Put(path string, contents string) error {
 }
 
 // 设置权限
-func (this Local) CreateFile(path string) error {
+func (this DriverLocal) CreateFile(path string) error {
     path = this.formatPath(path)
 
     if !this.checkFilePath(path) {
@@ -250,7 +255,7 @@ func (this Local) CreateFile(path string) error {
 }
 
 // 创建文件夹
-func (this Local) CreateDir(path string) error {
+func (this DriverLocal) CreateDir(path string) error {
     path = this.formatPath(path)
 
     if !this.checkFilePath(path) {
@@ -265,7 +270,7 @@ func (this Local) CreateDir(path string) error {
 }
 
 // 上传
-func (this Local) Upload(src io.Reader, path string, name string) error {
+func (this DriverLocal) Upload(src io.Reader, path string, name string) error {
     path = this.formatPath(path, name)
 
     if !this.checkFilePath(path) {
@@ -291,28 +296,7 @@ func (this Local) Upload(src io.Reader, path string, name string) error {
     return nil
 }
 
-// 是否为文件夹
-func (this Local) Basename(path string) string {
-    return Filesystem.Basename(path)
-}
-
-// 是否为文件夹
-func (this Local) ParentPath(path string) string {
-    if path == "" || path == "/" {
-        return ""
-    }
-
-    parentPath := Filesystem.Dirname(path)
-    parentPath = Filesystem.ToSlash(parentPath)
-
-    return parentPath
-}
-
-func (this Local) Extension(path string) string {
-    return Filesystem.Extension(path)
-}
-
-func (this Local) FormatFile(path string) (string, error) {
+func (this DriverLocal) FormatFile(path string) (string, error) {
     path = this.formatPath(path)
 
     if !this.checkFilePath(path) {
@@ -327,7 +311,7 @@ func (this Local) FormatFile(path string) (string, error) {
 }
 
 // 检测路径是否正常
-func (this Local) checkFilePath(path string) bool {
+func (this DriverLocal) checkFilePath(path string) bool {
     // 根目录
     rootPath, _ := Filesystem.Realpath(this.rootPath)
 
@@ -339,7 +323,7 @@ func (this Local) checkFilePath(path string) bool {
 }
 
 // 格式化路径
-func (this Local) formatPath(paths ...string) string {
+func (this DriverLocal) formatPath(paths ...string) string {
     filePath, _ := Filesystem.Realpath(this.rootPath)
 
     for _, path := range paths {
@@ -347,4 +331,64 @@ func (this Local) formatPath(paths ...string) string {
     }
 
     return filePath
+}
+
+// 格式化文件
+func formatFiles(files []string, path string) []map[string]any {
+    res := make([]map[string]any, 0)
+
+    for _, file := range files {
+        file = Filesystem.Join(path, file)
+
+        namesmall := Filesystem.Basename(file)
+        size      := Filesystem.Size(file)
+        time      := Filesystem.LastModified(file)
+        ext       := Filesystem.Extension(file)
+
+        perm, _    := Filesystem.PermString(file)
+        permInt, _ := Filesystem.Perm(file)
+
+        res = append(res, map[string]any{
+            "name":      file,
+            "namesmall": namesmall,
+            "isDir":     false,
+            "size":      FormatSize(size),
+            "time":      FormatTime(time),
+            "type":      DetectFileType(file),
+            "ext":       ext,
+            "perm":      perm,
+            "permInt":   fmt.Sprintf("%o", permInt),
+        })
+    }
+
+    return res
+}
+
+// 格式化文件夹
+func formatDirectories(dirs []string, path string) []map[string]any {
+    res := make([]map[string]any, 0)
+
+    for _, dir := range dirs {
+        dir = Filesystem.Join(path, dir)
+
+        namesmall := Filesystem.Basename(dir)
+        time      := Filesystem.LastModified(dir)
+
+        perm, _    := Filesystem.PermString(dir)
+        permInt, _ := Filesystem.Perm(dir)
+
+        res = append(res, map[string]any{
+            "name":      dir,
+            "namesmall": namesmall,
+            "isDir":     true,
+            "size":      "-",
+            "time":      FormatTime(time),
+            "type":      "folder",
+            "ext":       "",
+            "perm":      perm,
+            "permInt":   fmt.Sprintf("%o", permInt),
+        })
+    }
+
+    return res
 }

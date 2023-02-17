@@ -8,7 +8,7 @@ import (
 // 初始化文件管理器
 func initFs() {
     fs.AddDriver("local", func() fs.IFs {
-        return fs.NewLocal(global.Conf.File.Path)
+        return fs.NewDriverLocal(global.Conf.File.Path)
     })
 
     driver := fs.GetDriver(global.Conf.File.Driver)

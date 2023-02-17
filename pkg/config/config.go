@@ -17,13 +17,14 @@ type Conf struct {
 }
 
 type App struct {
-    Appname  string `toml:"app_name"`
-    Version  string `toml:"version"`
-    Debug    bool   `toml:"debug"`
-    TimeZone string `toml:"time_zone"`
-    LogFile  string `toml:"log_file"`
-    LogLevel string `toml:"log_level"`
-    Assets   string `toml:"assets"`
+    Appname   string `toml:"app_name"`
+    Version   string `toml:"version"`
+    Debug     bool   `toml:"debug"`
+    TimeZone  string `toml:"time_zone"`
+    LogFile   string `toml:"log_file"`
+    LogLevel  string `toml:"log_level"`
+    Assets    string `toml:"assets"`
+    CodeTheme string `toml:"code_theme"`
 }
 
 type Server struct {

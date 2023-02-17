@@ -18,41 +18,6 @@
 }
 </style>
 
-<link rel="stylesheet" href='{{ assets("js/codemirror/lib/codemirror.css") }}'>
-<script src='{{ assets("js/codemirror/lib/codemirror.js") }}'></script>
-
-<link rel="stylesheet" href='{{ assets("js/codemirror/theme/material.css") }}'>
-<link rel="stylesheet" href='{{ assets("js/codemirror/theme/eclipse.css") }}'>
-<link rel="stylesheet" href='{{ assets("js/codemirror/theme/seti.css") }}'>
-<link rel="stylesheet" href='{{ assets("js/codemirror/theme/dracula.css") }}'>
-
-<script src='{{ assets("js/codemirror/addon/selection/active-line.js") }}'></script>
-
-<!--支持代码折叠-->
-<link rel="stylesheet" href='{{ assets("js/codemirror/addon/fold/foldgutter.css") }}'/>
-<script src='{{ assets("js/codemirror/addon/fold/foldcode.js") }}'></script>
-<script src='{{ assets("js/codemirror/addon/fold/foldgutter.js") }}'></script>
-<script src='{{ assets("js/codemirror/addon/fold/brace-fold.js") }}'></script>
-<script src='{{ assets("js/codemirror/addon/fold/comment-fold.js") }}'></script>
-
-<!--全屏模式-->
-<link rel="stylesheet" href='{{ assets("js/codemirror/addon/display/fullscreen.css") }}'>
-<script src='{{ assets("js/codemirror/addon/display/fullscreen.js") }}'></script>
-
-<!--括号匹配-->
-<script src='{{ assets("js/codemirror/addon/edit/matchbrackets.js") }}'></script>
-
-<!--自动补全-->
-<link rel="stylesheet" href='{{ assets("js/codemirror/addon/hint/show-hint.css") }}'>
-<script src='{{ assets("js/codemirror/addon/hint/show-hint.js") }}'></script>
-<script src='{{ assets("js/codemirror/addon/hint/anyword-hint.js") }}'></script>
-
-<!--高亮类型-->
-<script src='{{ assets("js/codemirror/mode/go/go.js") }}'></script>
-
-<script src='{{ assets("js/jquery.js") }}' type="text/javascript"></script>
-<script src='{{ assets("js/layer/layer.js") }}' type="text/javascript"></script>
-
 <div class="main-box clearfix">
     <div class="main-box-body clearfix">
         <form role="form">
@@ -76,32 +41,78 @@
 {% endblock %}
 
 {% block script %}
+<link rel="stylesheet" href='{{ assets("js/codemirror/lib/codemirror.css") }}'>
+<script src='{{ assets("js/codemirror/lib/codemirror.js") }}'></script>
+
+<script src='{{ assets("js/codemirror/addon/selection/active-line.js") }}'></script>
+
+<!--支持代码折叠-->
+<link rel="stylesheet" href='{{ assets("js/codemirror/addon/fold/foldgutter.css") }}'/>
+<script src='{{ assets("js/codemirror/addon/fold/foldcode.js") }}'></script>
+<script src='{{ assets("js/codemirror/addon/fold/foldgutter.js") }}'></script>
+<script src='{{ assets("js/codemirror/addon/fold/brace-fold.js") }}'></script>
+<script src='{{ assets("js/codemirror/addon/fold/comment-fold.js") }}'></script>
+
+<!--全屏模式-->
+<link rel="stylesheet" href='{{ assets("js/codemirror/addon/display/fullscreen.css") }}'>
+<script src='{{ assets("js/codemirror/addon/display/fullscreen.js") }}'></script>
+
+<!--括号匹配-->
+<script src='{{ assets("js/codemirror/addon/edit/matchbrackets.js") }}'></script>
+
+<!--自动补全-->
+<link rel="stylesheet" href='{{ assets("js/codemirror/addon/hint/show-hint.css") }}'>
+<script src='{{ assets("js/codemirror/addon/hint/show-hint.js") }}'></script>
+<script src='{{ assets("js/codemirror/addon/hint/anyword-hint.js") }}'></script>
+
+<!--高亮类型-->
+<script src='{{ assets("js/codemirror/addon/mode/loadmode.js") }}'></script>
+<script src='{{ assets("js/codemirror/mode/meta.js") }}'></script>
+<script src='{{ assets("js/loadcss.js") }}' type="text/javascript"></script>
+
+<script src='{{ assets("js/jquery.js") }}' type="text/javascript"></script>
+<script src='{{ assets("js/layer/layer.js") }}' type="text/javascript"></script>
+
 <script type="text/javascript">
 ;(function($) {
     "use strict";
     
+    // 加载主题 material | eclipse | seti | dracula | abcdef
+    var theme = "{{ getCfg().App.CodeTheme }}";
+    
+    var themeURL = "{{ assets('js/codemirror/theme/%N.css') }}";
+    themeURL = themeURL.replace(/%N/g, theme);
+    loadCss({
+        url: themeURL,
+        id: "theme"
+    });
+    
     // 语法高亮
+    CodeMirror.modeURL = "{{ assets('js/codemirror/mode/%N/%N.js') }}";
     var editor = CodeMirror.fromTextArea(document.getElementById("file-content"), {
         // 显示行号
         lineNumbers: true,
         styleActiveLine: true,
         
         // 主题
-        theme: "material",
+        theme: theme,
         
         // 代码折叠
-        lineWrapping:false,
+        lineWrapping: false,
         foldGutter: true,
-        gutters:["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+        gutters:[
+            "CodeMirror-linenumbers", 
+            "CodeMirror-foldgutter"
+        ],
 
         // 全屏模式
-        fullScreen:false,
+        fullScreen: false,
 
         // 括号匹配
-        matchBrackets:true,
+        matchBrackets: true,
 
-        // ctrl-space唤起智能提示 
-        extraKeys:{
+        // ctrl-space 唤起智能提示 
+        extraKeys: {
             "Ctrl-Space":"autocomplete",
             "Shift-Alt-Enter": function (cm) {
                 cm.setOption("fullScreen", !cm.getOption("fullScreen"));
@@ -109,8 +120,17 @@
         },
         
         // 高亮
-        mode: "go"
+        mode: "null"
     });
+    
+    var ext = "{{ ext }}";
+    var info = CodeMirror.findModeByExtension(ext);
+    if (info) {
+        editor.setOption("mode", info.mime);
+        CodeMirror.autoLoadMode(editor, info.mode);
+    }
+    
+    // 动态更新内容
     editor.on("change", function(cm) {
         $("#file-content").val(cm.getValue())
     });

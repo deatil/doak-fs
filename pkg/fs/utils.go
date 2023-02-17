@@ -29,59 +29,7 @@ var fileTypes = map[string]string{
     "md"     : "md",
 }
 
-// 格式化文件
-func formatFiles(files []string, path string) []map[string]any {
-    res := make([]map[string]any, 0)
-
-    for _, file := range files {
-        file = Filesystem.Join(path, file)
-
-        perm, _ := Filesystem.PermString(file)
-        permInt, _ := Filesystem.Perm(file)
-
-        res = append(res, map[string]any{
-            "name":      file,
-            "namesmall": Filesystem.Basename(file),
-            "isDir":     false,
-            "size":      formatSize(Filesystem.Size(file)),
-            "time":      formatTime(Filesystem.LastModified(file)),
-            "type":      detectFileType(file),
-            "ext":       Filesystem.Extension(file),
-            "perm":      perm,
-            "permInt":   fmt.Sprintf("%o", permInt),
-        })
-    }
-
-    return res
-}
-
-// 格式化文件夹
-func formatDirectories(dirs []string, path string) []map[string]any {
-    res := make([]map[string]any, 0)
-
-    for _, dir := range dirs {
-        dir = Filesystem.Join(path, dir)
-
-        perm, _ := Filesystem.PermString(dir)
-        permInt, _ := Filesystem.Perm(dir)
-
-        res = append(res, map[string]any{
-            "name":      dir,
-            "namesmall": Filesystem.Basename(dir),
-            "isDir":     true,
-            "size":      "-",
-            "time":      formatTime(Filesystem.LastModified(dir)),
-            "type":      "folder",
-            "ext":       "",
-            "perm":      perm,
-            "permInt":   fmt.Sprintf("%o", permInt),
-        })
-    }
-
-    return res
-}
-
-func detectFileType(file string) string {
+func DetectFileType(file string) string {
     extension := Filesystem.Extension(file)
 
     for typ, regex := range fileTypes {
@@ -95,12 +43,12 @@ func detectFileType(file string) string {
 }
 
 // 格式化时间
-func formatTime(date int64) string {
+func FormatTime(date int64) string {
     return fs_time.FromTimestamp(date).ToDateTimeString()
 }
 
 // 格式化数据大小
-func formatSize(size int64) string {
+func FormatSize(size int64) string {
     units := []string{" B", " KB", " MB", " GB", " TB", " PB"}
 
     s := float64(size)

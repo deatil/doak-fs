@@ -6,6 +6,8 @@ time_zone = 'Asia/Hong_Kong'
 log_file = './fs-log.log'
 log_level = 'error'
 assets = '/static'
+# 文件预览主题
+code_theme = "ambiance"
 
 [server]
 address = ':1323'
