@@ -16,8 +16,7 @@
 
 ![login](https://user-images.githubusercontent.com/24578855/210959506-d4658f30-8218-49ec-af72-de40afaa433c.png)
 ![index](https://user-images.githubusercontent.com/24578855/210959601-88b95974-233e-4990-ab45-e413fe46705a.png)
-![file](https://user-images.githubusercontent.com/24578855/210959611-746ec845-9ade-4976-b350-0ec423cf47f4.png)
-
+![file](https://user-images.githubusercontent.com/24578855/219553564-dbd3dea2-df6e-4d0d-b6ba-ac0a94ec12c9.png)
 
 ### 使用方法
 
