@@ -43,9 +43,12 @@ func Route(e *echo.Echo) {
         fileGroup.POST("/create-file", fileController.CreateFile)
         fileGroup.GET("/update-file", fileController.UpdateFile)
         fileGroup.POST("/update-file", fileController.UpdateFileSave)
-        fileGroup.GET("/download-file", fileController.DownloadFile)
 
         fileGroup.POST("/create-dir", fileController.CreateDir)
+
+        // 本地相关
+        fileGroup.GET("/download-file", fileController.DownloadFile)
+        fileGroup.GET("/preview-file", fileController.PreviewFile)
     }
 }
 

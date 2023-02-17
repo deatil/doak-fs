@@ -109,7 +109,7 @@
                                             <td>
                                                 {{ item.perm }}
                                             </td>
-                                            <td style="width: 15%;">
+                                            <td style="width: 18%;">
                                                 <a href="javascript:;"
                                                     class="table-link js-info-btn"
                                                     data-file="{{ path }}/{{ item.namesmall }}"
@@ -119,6 +119,19 @@
                                                         <i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
                                                     </span>
                                                 </a>
+                                                
+                                                {% if item.type == "image" || item.type == "audio" || item.type == "video" %}
+                                                    <a href="javascript:;"
+                                                        class="table-link js-preview-btn"
+                                                        data-file="{{ path }}/{{ item.namesmall }}"
+                                                        data-type="{{ item.type }}"
+                                                        title="预览">
+                                                        <span class="fa-stack">
+                                                            <i class="fa fa-square fa-stack-2x"></i>
+                                                            <i class="fa fa-eye fa-stack-1x fa-inverse"></i>
+                                                        </span>
+                                                    </a>
+                                                {% endif %}
 
                                                 {% if !item.isDir %}
                                                     <a href="javascript:;"
@@ -237,6 +250,38 @@
             shade: 0.2,
             area: ['500px', '450px'],
             content: href,
+        });
+    });
+    
+    // 预览
+    $('.js-preview-btn').click(function(e) {
+        var type = $(this).data('type');
+        var file = $(this).data('file');
+        
+        var url = '/file/preview-file?file=' + file;
+        
+        var preview = '';
+        var height = '86%';
+        if (type == 'image') {
+            preview = '<img height="100%" src="' + url + '" />';
+        } else if (type == 'video') {
+            preview = '<video height="100%" controls src="' + url + '"></video>';
+        } else if (type == 'audio') {
+            height = 'auto';
+            preview = '<audio controls src="' + url + '"></audio>';
+        }
+        
+        layer.open({
+            type: 1,
+            area: ['auto', height],
+            title: "预览",
+            shadeClose: true,
+            maxmin: true,
+            shade: 0.2,
+            end: function(index, layero) {
+                return false;
+            },
+            content: '<div style="display: flex;align-items: center;justify-content: center;text-align: justify;height: 100%;">'+preview+'</div>',
         });
     });
 

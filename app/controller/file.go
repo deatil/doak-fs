@@ -227,6 +227,22 @@ func (this *File) UploadSave(ctx echo.Context) error {
     return response.ReturnSuccessJson(ctx, "上传文件成功", "")
 }
 
+// 创建文件夹
+func (this *File) CreateDir(ctx echo.Context) error {
+    dir := ctx.FormValue("dir")
+    if dir == "" {
+        return response.ReturnErrorJson(ctx, "文件夹不能为空")
+    }
+
+    if err := global.Fs.CreateDir(dir); err != nil {
+        return response.ReturnErrorJson(ctx, "创建文件夹失败")
+    }
+
+    return response.ReturnSuccessJson(ctx, "创建文件夹成功", "")
+}
+
+// ============== 本地相关 ==============
+
 // 下载文件
 func (this *File) DownloadFile(ctx echo.Context) error {
     file := ctx.QueryParam("file")
@@ -244,17 +260,26 @@ func (this *File) DownloadFile(ctx echo.Context) error {
     return response.Attachment(ctx, filePath, basename)
 }
 
-// 创建文件夹
-func (this *File) CreateDir(ctx echo.Context) error {
-    dir := ctx.FormValue("dir")
-    if dir == "" {
-        return response.ReturnErrorJson(ctx, "文件夹不能为空")
+// 预览文件
+func (this *File) PreviewFile(ctx echo.Context) error {
+    file := ctx.QueryParam("file")
+    if file == "" {
+        return response.String(ctx, "文件不能为空")
     }
 
-    if err := global.Fs.CreateDir(dir); err != nil {
-        return response.ReturnErrorJson(ctx, "创建文件夹失败")
+    data := global.Fs.Read(file)
+
+    if data["type"] != "image" &&
+        data["type"] != "audio" &&
+        data["type"] != "video" {
+        return response.String(ctx, "文件不存在")
     }
 
-    return response.ReturnSuccessJson(ctx, "创建文件夹成功", "")
+    filePath, err := global.Fs.FormatFile(file)
+    if err != nil {
+        return response.String(ctx, "文件错误")
+    }
+
+    return response.File(ctx, filePath)
 }
 
