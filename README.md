@@ -14,8 +14,8 @@
 
 ### 截图预览
 
-![login](https://user-images.githubusercontent.com/24578855/210959506-d4658f30-8218-49ec-af72-de40afaa433c.png)
-![index](https://user-images.githubusercontent.com/24578855/210959601-88b95974-233e-4990-ab45-e413fe46705a.png)
+![login](https://user-images.githubusercontent.com/24578855/219612410-b6994879-33d1-49d4-818e-d6d3be9fe50d.png)
+![index](https://user-images.githubusercontent.com/24578855/219612392-f1555a54-ea09-441a-a1c2-eaf17b2b37d6.png)
 ![file](https://user-images.githubusercontent.com/24578855/219553564-dbd3dea2-df6e-4d0d-b6ba-ac0a94ec12c9.png)
 
 ### 使用方法
