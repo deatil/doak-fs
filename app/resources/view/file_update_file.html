@@ -11,10 +11,16 @@
 .main-box .main-box-body {
     padding: 20px;
 }
-@media screen and (max-width: 767px) {
-    .table-responsive {
-        margin-bottom: 0;
-    }
+.toolbar {
+    background: #f7f7f7;
+    padding: 3px 5px;
+    font-size: 0.85em;
+}
+.toolbar.top, .toolbar.after-top {
+    border-bottom: 1px solid #ddd;
+}
+#toolbar-box {
+    display: none;
 }
 </style>
 
@@ -25,16 +31,48 @@
                 <label for="file-content">文件</label>
                 <input type="text" class="form-control" readonly placeholder="文件" value="{{ file }}">
             </div>
-            
+
             <div class="form-group">
                 <label for="file-content">内容</label>
-                <textarea class="form-control" id="file-content" rows="5">{{ data }}</textarea>
+                <textarea class="form-control" id="file-content" rows="8">{{ data }}</textarea>
             </div>
-            
+
             <input type="hidden" id="fs-file" value="{{ file }}" />
             <div class="form-group">
                 <button type="button" class="btn btn-success pull-right js-save-btn">提交保存</button>
             </div>
+        </form>
+    </div>
+</div>
+
+<div id="toolbar-box">
+    <div id="toolbar" class="toolbar top">
+        <form class="form-inline" role="form" method="get">
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        主题
+                    </span>
+                    <select name="theme" class="form-control toolbar-theme">
+                        <option value="material">material</option>
+                        <option value="eclipse">eclipse</option>
+                        <option value="seti">seti</option>
+                        <option value="dracula">dracula</option>
+                        <option value="abcdef">abcdef</option>
+                        <option value="lucario">lucario</option>
+                        <option value="midnight">midnight</option>
+                        <option value="yonce">yonce</option>
+                        <option value="rubyblue">rubyblue</option>
+                        <option value="mbo">mbo</option>
+                    </select>
+                </div>
+            </div>
+        
+            <a href="javascript:;" 
+                class="btn btn-default js-fullscreen-btn" 
+                title="Shift-Alt-Enter 退出全屏">
+                全屏
+            </a>
         </form>
     </div>
 </div>
@@ -65,6 +103,13 @@
 <script src='{{ assets("js/codemirror/addon/hint/show-hint.js") }}'></script>
 <script src='{{ assets("js/codemirror/addon/hint/anyword-hint.js") }}'></script>
 
+<!--matchtags-->
+<script src='{{ assets("js/codemirror/addon/fold/xml-fold.js") }}'></script>
+<script src='{{ assets("js/codemirror/addon/edit/matchtags.js") }}'></script>
+<script src='{{ assets("js/codemirror/mode/xml/xml.js") }}'></script>
+
+<script src='{{ assets("js/codemirror/addon/display/panel.js") }}'></script>
+
 <!--高亮类型-->
 <script src='{{ assets("js/codemirror/addon/mode/loadmode.js") }}'></script>
 <script src='{{ assets("js/codemirror/mode/meta.js") }}'></script>
@@ -76,32 +121,33 @@
 <script type="text/javascript">
 ;(function($) {
     "use strict";
-    
-    // 加载主题 material | eclipse | seti | dracula | abcdef
+
+    // 加载主题
     var theme = "{{ getCfg().App.CodeTheme }}";
-    
+
     var themeURL = "{{ assets('js/codemirror/theme/%N.css') }}";
-    themeURL = themeURL.replace(/%N/g, theme);
     loadCss({
-        url: themeURL,
+        url: themeURL.replace(/%N/g, theme),
         id: "theme"
     });
-    
+
     // 语法高亮
     CodeMirror.modeURL = "{{ assets('js/codemirror/mode/%N/%N.js') }}";
     var editor = CodeMirror.fromTextArea(document.getElementById("file-content"), {
         // 显示行号
         lineNumbers: true,
         styleActiveLine: true,
-        
+
+        lineWrapping: false,
+
         // 主题
         theme: theme,
-        
+
         // 代码折叠
         lineWrapping: false,
         foldGutter: true,
         gutters:[
-            "CodeMirror-linenumbers", 
+            "CodeMirror-linenumbers",
             "CodeMirror-foldgutter"
         ],
 
@@ -111,18 +157,23 @@
         // 括号匹配
         matchBrackets: true,
 
-        // ctrl-space 唤起智能提示 
+        matchTags: {
+            bothTags: true
+        },
+
+        // ctrl-space 唤起智能提示
         extraKeys: {
-            "Ctrl-Space":"autocomplete",
+            "Ctrl-J": "toMatchingTag",
+            "Ctrl-Space": "autocomplete",
             "Shift-Alt-Enter": function (cm) {
                 cm.setOption("fullScreen", !cm.getOption("fullScreen"));
             }
         },
-        
+
         // 高亮
         mode: "null"
     });
-    
+
     var ext = "{{ ext }}";
     var info = CodeMirror.findModeByExtension(ext);
     if (info) {
@@ -130,11 +181,41 @@
         CodeMirror.autoLoadMode(editor, info.mode);
     }
     
+    // pancel
+    var node = $("#toolbar-box #toolbar")[0];
+    editor.addPanel(node, {
+        position: "top", // top | bottom
+        stable: true
+    });
+    
+    $(".toolbar-theme").val(theme);
+    
+    var themes = [];
+    $("body").on("change", ".toolbar-theme", function() {
+        var nowTheme = $(this).val();
+        
+        if (! themes.includes(nowTheme)) {
+            var nowThemeURL = themeURL.replace(/%N/g, nowTheme);
+            loadCss({
+                url: nowThemeURL,
+                id: "theme"
+            });
+            
+            themes.push(nowTheme);
+        }
+        
+        editor.setOption("theme", nowTheme);
+    });
+    
+    $("body").on("click", ".js-fullscreen-btn", function() {
+        editor.setOption("fullScreen", !editor.getOption("fullScreen"));
+    });
+
     // 动态更新内容
     editor.on("change", function(cm) {
         $("#file-content").val(cm.getValue())
     });
-    
+
     // 保存
     $(".js-save-btn").click(function(e) {
         e.stopPropagation;
@@ -150,7 +231,7 @@
         }, function(data) {
             if (data.code == 0) {
                 layer.msg("保存成功");
-                
+
                 setTimeout(function() {
                     window.location.reload();
                 }, 1500);

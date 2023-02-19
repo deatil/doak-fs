@@ -94,6 +94,9 @@ func Start() {
         },
     }))
 
+    // 跳转到 www 开头
+    // e.Use(middleware.WWWRedirect())
+
     // 加密
     e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
         Skipper:            middleware.DefaultSkipper,

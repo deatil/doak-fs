@@ -7,7 +7,9 @@ log_file = './fs-log.log'
 log_level = 'error'
 assets = '/static'
 # 文件预览主题
-code_theme = "ambiance"
+# material | eclipse | seti | dracula | abcdef | lucario | midnight
+# yonce | rubyblue | mbo
+code_theme = "mbo"
 
 [server]
 address = ':1323'

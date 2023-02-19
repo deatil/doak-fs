@@ -21,7 +21,7 @@
                     <header class="main-box-header clearfix">
                         <div class="pull-left">
                             <h2>文件列表 | {{ name }}</h2>
-                            
+
                             {% if path == "" %}
                                 <div class="fs-path" id="fs-path" data-path="/">/</div>
                             {% else %}
@@ -75,8 +75,10 @@
                                     {% if parentPath != "" %}
                                         <tr>
                                             <td class="sys-name" colspan="7" data-name="{{ parentPath }}">
+                                                <i class="fa fa-folder-o"></i>
+
                                                 <a href="/file/index?path={{ parentPath }}" title="返回上级">
-                                                    ..
+                                                    ...
                                                 </a>
                                             </td>
                                         </tr>
@@ -86,7 +88,7 @@
                                         <tr>
                                             <td class="sys-name">
                                                 <i class="{{ faIcon(item.type) }}"></i>
-                                                
+
                                                 {% if item.isDir %}
                                                     <a href="/file/index?path={{ path }}/{{ item.namesmall }}" title="{{ item.namesmall }}">{{ item.namesmall }}</a>
                                                 {% else %}
@@ -119,7 +121,7 @@
                                                         <i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
                                                     </span>
                                                 </a>
-                                                
+
                                                 {% if item.type == "image" || item.type == "audio" || item.type == "video" %}
                                                     <a href="javascript:;"
                                                         class="table-link js-preview-btn"
@@ -153,7 +155,7 @@
                                                         </span>
                                                     </a>
                                                 {% endif %}
-                                                
+
                                                 <a href="javascript:;"
                                                     class="table-link js-move-btn"
                                                     data-file="{{ path }}/{{ item.namesmall }}"
@@ -164,7 +166,7 @@
                                                         <i class="fa fa-exchange fa-stack-1x fa-inverse"></i>
                                                     </span>
                                                 </a>
-                                                
+
                                                 <a href="javascript:;"
                                                     class="table-link js-rename-btn"
                                                     data-file="{{ path }}/{{ item.namesmall }}"
@@ -252,14 +254,14 @@
             content: href,
         });
     });
-    
+
     // 预览
     $('.js-preview-btn').click(function(e) {
         var type = $(this).data('type');
         var file = $(this).data('file');
-        
+
         var url = '/file/preview-file?file=' + file;
-        
+
         var preview = '';
         var height = '86%';
         if (type == 'image') {
@@ -270,7 +272,7 @@
             height = 'auto';
             preview = '<audio controls src="' + url + '"></audio>';
         }
-        
+
         layer.open({
             type: 1,
             area: ['auto', height],
@@ -294,6 +296,7 @@
             type: 2,
             title: '编辑文件',
             shadeClose: true,
+            maxmin: true,
             shade: 0.2,
             area: ['80%', '86%'],
             content: href,
@@ -307,7 +310,7 @@
 
         window.open(href, '_blank');
     });
-    
+
     // 创建文件夹
     $(".js-create-dir-btn").click(function() {
         var content = '';
@@ -329,7 +332,7 @@
     $("body").on('click', '.js-create-dir-save-btn', function(e) {
         var dirName = $("#newDirName").val();
         var dir = "{{ path }}/" + dirName;
-        
+
         var url = "/file/create-dir";
 
         $.post(url, {
@@ -350,7 +353,7 @@
             }
         });
     });
-    
+
     // 创建文件
     $(".js-create-file-btn").click(function() {
         var content = '';
@@ -372,7 +375,7 @@
     $("body").on('click', '.js-create-file-save-btn', function(e) {
         var fileName = $("#newFileName").val();
         var file = "{{ path }}/" + fileName;
-        
+
         var url = "/file/create-file";
 
         $.post(url, {
@@ -393,7 +396,7 @@
             }
         });
     });
-    
+
     // 重命名
     $(".js-rename-btn").click(function() {
         var oldName = $(this).data('name');
@@ -416,10 +419,10 @@
     $("body").on('click', '.js-rename-save-btn', function(e) {
         var oldName = $("#newRenameName").data('name');
         var newName = $("#newRenameName").val();
-        
+
         var oldName = "{{ path }}/" + oldName;
         var newName = "{{ path }}/" + newName;
-        
+
         var url = "/file/rename";
 
         $.post(url, {
