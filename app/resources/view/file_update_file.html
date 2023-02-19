@@ -69,6 +69,12 @@
             </div>
         
             <a href="javascript:;" 
+                class="btn btn-default js-linewrapping-btn" 
+                title="自动换行">
+                自动换行
+            </a>
+        
+            <a href="javascript:;" 
                 class="btn btn-default js-fullscreen-btn" 
                 title="Shift-Alt-Enter 退出全屏">
                 全屏
@@ -138,8 +144,6 @@
         lineNumbers: true,
         styleActiveLine: true,
 
-        lineWrapping: false,
-
         // 主题
         theme: theme,
 
@@ -205,6 +209,10 @@
         }
         
         editor.setOption("theme", nowTheme);
+    });
+    
+    $("body").on("click", ".js-linewrapping-btn", function() {
+        editor.setOption("lineWrapping", !editor.getOption("lineWrapping"));
     });
     
     $("body").on("click", ".js-fullscreen-btn", function() {
