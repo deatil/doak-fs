@@ -20,6 +20,7 @@ type IFs interface {
     Upload(rd io.Reader, path string, name string) error
     Rename(oldName string, newName string) error
     Move(oldName string, newName string) error
+    Copy(oldName string, newName string) error
 
     Basename(path string) string
     ParentPath(path string) string
@@ -105,6 +106,10 @@ func (this Fs) Rename(oldName string, newName string) error {
 
 func (this Fs) Move(oldName string, newName string) error {
     return this.Driver.Move(oldName, newName)
+}
+
+func (this Fs) Copy(oldName string, newName string) error {
+    return this.Driver.Copy(oldName, newName)
 }
 
 func (this Fs) FormatFile(path string) (string, error) {

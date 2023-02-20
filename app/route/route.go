@@ -37,6 +37,8 @@ func Route(e *echo.Echo) {
         fileGroup.POST("/rename", fileController.Rename)
         fileGroup.GET("/move", fileController.Move)
         fileGroup.POST("/move", fileController.MoveSave)
+        fileGroup.GET("/copy", fileController.Copy)
+        fileGroup.POST("/copy", fileController.CopySave)
         fileGroup.GET("/upload", fileController.Upload)
         fileGroup.POST("/upload", fileController.UploadSave)
 

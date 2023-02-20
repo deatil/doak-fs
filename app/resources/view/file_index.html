@@ -85,7 +85,7 @@
                                     {% endif %}
 
                                     {% for item in list %}
-                                        <tr>
+                                        <tr class="file-item-contextmenu" data-type="{{ item.type }}">
                                             <td class="sys-name">
                                                 <i class="{{ faIcon(item.type) }}"></i>
 
@@ -105,7 +105,7 @@
                                                 {% if item.isDir %}
                                                     -
                                                 {% else %}
-                                                    {{ item.size }}
+                                                    {{ formatSize(item.size) }}
                                                 {% endif %}
                                             </td>
                                             <td>
@@ -163,7 +163,18 @@
                                                     title="移动">
                                                     <span class="fa-stack">
                                                         <i class="fa fa-square fa-stack-2x"></i>
-                                                        <i class="fa fa-exchange fa-stack-1x fa-inverse"></i>
+                                                        <i class="fa fa-arrows fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
+
+                                                <a href="javascript:;"
+                                                    class="table-link js-copy-btn"
+                                                    data-file="{{ path }}/{{ item.namesmall }}"
+                                                    data-name="{{ item.namesmall }}"
+                                                    title="复制">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa fa-copy fa-stack-1x fa-inverse"></i>
                                                     </span>
                                                 </a>
 
@@ -206,11 +217,45 @@
 {% block script %}
 {{ block.Super }}
 
+<script src='{{ assets("js/contextMenu/jquery.contextMenu.js") }}' type="text/javascript"></script>
+<link href='{{ assets("js/contextMenu/jquery.contextMenu.css") }}' rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 ;(function($) {
     "use strict";
 
     $(".left-nav-file").addClass("active");
+    
+     $.contextMenu({
+         selector: '.file-item-contextmenu',
+         callback: function(key, options) {
+             // $(this).find('.js-' + key + '-btn').trigger("click");
+         },
+         items: {
+            "info": {
+                name: "详情", 
+                icon: "copy",
+                callback: function(itemKey, opt, rootMenu, originalEvent) {
+                    $(this).find('.js-info-btn').trigger("click");
+                }
+            },
+            "sep": "---------",
+            "rename": {
+                name: "重命名", 
+                icon: "edit",
+                callback: function(itemKey, opt, rootMenu, originalEvent) {
+                    $(this).find('.js-rename-btn').trigger("click");
+                }
+            },
+            "delete": {
+                name: "删除", 
+                icon: "delete",
+                callback: function(itemKey, opt, rootMenu, originalEvent) {
+                    $(this).find('.js-delete-btn').trigger("click");
+                }
+            },
+         }
+
+     });
 
     // 删除
     $('.js-delete-btn').click(function() {
@@ -453,6 +498,21 @@
         layer.open({
             type: 2,
             title: '移动',
+            shadeClose: true,
+            shade: 0.2,
+            area: ['80%', '86%'],
+            content: href,
+        });
+    });
+
+    // 复制
+    $('.js-copy-btn').click(function(e) {
+        var file = $(this).data("file");
+        var href = '/file/copy?old=' + file;
+
+        layer.open({
+            type: 2,
+            title: '复制',
             shadeClose: true,
             shade: 0.2,
             area: ['80%', '86%'],

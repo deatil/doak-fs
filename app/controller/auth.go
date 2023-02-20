@@ -45,11 +45,21 @@ func (this *Auth) Captcha(ctx echo.Context) error {
 
 // 登录页面
 func (this *Auth) Login(ctx echo.Context) error {
+    userid := session.Get(ctx, "userid")
+    if userid != nil {
+        return response.Redirect(ctx, "/")
+    }
+
     return response.Render(ctx, "auth_login.html", map[string]any{})
 }
 
 // 检测登录
 func (this *Auth) LoginCheck(ctx echo.Context) error {
+    userid := session.Get(ctx, "userid")
+    if userid != nil {
+        return response.ReturnErrorJson(ctx, "你已经登录过了")
+    }
+
     username := ctx.FormValue("username")
     password := ctx.FormValue("password")
     captchaData := ctx.FormValue("captcha")

@@ -30,6 +30,7 @@ func ViewFuncs() map[string]any {
 
     // 图标
     funcs["faIcon"] = utils.GetFaIcon
+    funcs["formatSize"] = utils.FormatSize
 
     return funcs
 }

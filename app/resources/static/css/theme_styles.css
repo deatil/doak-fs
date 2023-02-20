@@ -4792,11 +4792,13 @@ svg { width: 100%!important }
     top: 0;
 }
 #config-tool.closed #config-tool-cog i {
+    /*
     -webkit-animation: rotating 3s linear infinite;
     -moz-animation: rotating 3s linear infinite;
     -ms-animation: rotating 3s linear infinite;
     -o-animation: rotating 3s linear infinite;
     animation: rotating 3s linear infinite;
+    */
 }
 #config-tool.closed #config-tool-cog:hover {
     background-color: #1ABC9C;

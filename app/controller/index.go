@@ -1,6 +1,7 @@
 package controller
 
 import (
+    "path/filepath"
     "github.com/labstack/echo/v4"
 
     "github.com/deatil/doak-fs/pkg/time"
@@ -25,11 +26,14 @@ func (this *Index) Index(ctx echo.Context) error {
 
     startTime := time.FromTime(global.StartTime).ToDateTimeString()
 
+    runPath := utils.RunPath()
+    runPath = filepath.Base(runPath)
+
     return response.Render(ctx, "index_index.html", map[string]any{
-        "username": username,
+        "username":  username,
         "startTime": startTime,
-        "conf": global.Conf,
-        "run_path": utils.RunPath(),
+        "conf":      global.Conf,
+        "run_path":  runPath,
     })
 }
 

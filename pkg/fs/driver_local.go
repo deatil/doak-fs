@@ -70,14 +70,14 @@ func (this DriverLocal) Read(path string) map[string]any {
         return make(map[string]any)
     }
 
-    size  := "-"
+    size  := int64(0)
     typ   := "folder"
     ext   := ""
     isDir := true
 
     if Filesystem.IsFile(path) {
         typ   = DetectFileType(path)
-        size  = FormatSize(Filesystem.Size(path))
+        size  = Filesystem.Size(path)
         ext   = Filesystem.Extension(path)
         isDir = false
     }
@@ -179,6 +179,44 @@ func (this DriverLocal) Move(oldName string, newName string) error {
     err := Filesystem.Move(oldName, newName)
     if err != nil {
         return errors.New("移动文件失败")
+    }
+
+    return nil
+}
+
+// 复制
+func (this DriverLocal) Copy(oldName string, newName string) error {
+    oldName = this.formatPath(oldName)
+
+    oldBasename := this.Basename(oldName)
+    newName = this.formatPath(newName, oldBasename)
+
+    if !this.checkFilePath(oldName) {
+        return errors.New("访问错误")
+    }
+
+    if !this.checkFilePath(newName) {
+        return errors.New("访问错误")
+    }
+
+    if !this.Exists(oldName) {
+        return errors.New("旧名称不存在")
+    }
+
+    if this.Exists(newName) {
+        return errors.New("新名称已经存在")
+    }
+
+    if this.IsDirectory(oldName) {
+        err := Filesystem.CopyDirectory(oldName, newName)
+        if err != nil {
+            return errors.New("复制文件夹失败")
+        }
+    } else {
+        err := Filesystem.Copy(oldName, newName)
+        if err != nil {
+            return errors.New("复制文件失败")
+        }
     }
 
     return nil
@@ -352,7 +390,7 @@ func formatFiles(files []string, path string) []map[string]any {
             "name":      file,
             "namesmall": namesmall,
             "isDir":     false,
-            "size":      FormatSize(size),
+            "size":      size,
             "time":      FormatTime(time),
             "type":      DetectFileType(file),
             "ext":       ext,

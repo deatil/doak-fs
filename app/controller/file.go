@@ -128,10 +128,53 @@ func (this *File) MoveSave(ctx echo.Context) error {
     }
 
     if err := global.Fs.Move(oldName, newName); err != nil {
-        return response.ReturnErrorJson(ctx, "移动文件失败")
+        return response.ReturnErrorJson(ctx, "移动失败。原因: " + err.Error())
     }
 
-    return response.ReturnSuccessJson(ctx, "移动文件成功", "")
+    return response.ReturnSuccessJson(ctx, "移动成功", "")
+}
+
+// 复制
+func (this *File) Copy(ctx echo.Context) error {
+    old := ctx.FormValue("old")
+    if old == "" {
+        return response.String(ctx, "访问错误")
+    }
+
+    path := ctx.QueryParam("path")
+
+    list := global.Fs.LsDir(path)
+    parentPath := global.Fs.ParentPath(path)
+
+    if path == "" || path == "/" {
+        path = "/"
+    }
+
+    return response.Render(ctx, "file_copy.html", map[string]any{
+        "old": old,
+        "path": path,
+        "parentPath": parentPath,
+        "list": list,
+    })
+}
+
+// 复制保存
+func (this *File) CopySave(ctx echo.Context) error {
+    oldName := ctx.FormValue("old_name")
+    if oldName == "" {
+        return response.ReturnErrorJson(ctx, "旧名称不能为空")
+    }
+
+    newName := ctx.FormValue("new_name")
+    if newName == "" {
+        return response.ReturnErrorJson(ctx, "新名称不能为空")
+    }
+
+    if err := global.Fs.Copy(oldName, newName); err != nil {
+        return response.ReturnErrorJson(ctx, "复制失败。原因: " + err.Error())
+    }
+
+    return response.ReturnSuccessJson(ctx, "复制成功", "")
 }
 
 // 创建文件
@@ -153,6 +196,11 @@ func (this *File) UpdateFile(ctx echo.Context) error {
     file := ctx.FormValue("file")
     if file == "" {
         return response.String(ctx, "文件不能为空")
+    }
+
+    info := global.Fs.Read(file)
+    if info["size"].(int64) > 15728640 {
+        return response.String(ctx, "文件太大不支持打开")
     }
 
     data, err := global.Fs.Get(file)
