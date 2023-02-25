@@ -9,6 +9,7 @@ import (
     "github.com/labstack/echo/v4"
     "github.com/labstack/echo/v4/middleware"
     "github.com/labstack/gommon/log"
+    "github.com/labstack/gommon/color"
 
     "github.com/deatil/doak-fs/pkg/global"
     "github.com/deatil/doak-fs/pkg/logger"
@@ -19,6 +20,22 @@ import (
     "github.com/deatil/doak-fs/app/view"
     "github.com/deatil/doak-fs/app/route"
     "github.com/deatil/doak-fs/app/resources"
+)
+
+const (
+    website = "https://github.com/deatil/doak-fs"
+    banner = `
+    .___            __               _____
+  __| _/_________  |  | __         _/ ____\______
+ / __ |/  _ \__  \ |  |/ /  ______ \   __\/  ___/
+/ /_/ (  <_> ) __ \|    <  /_____/  |  |  \___ \
+\____ |\____(____  /__|_ \          |__| /____  >
+     \/          \/     \/                    \/  %s
+Web filesystem base on echo %s
+%s
+_____________________________________________________
+
+`
 )
 
 // 初始化
@@ -50,8 +67,12 @@ func Start() {
     logger.SetLoggerFile(global.Conf.App.LogFile)
     logger.SetLoggerLevel(global.Conf.App.LogLevel)
 
+    // 隐藏默认
+    e.HideBanner = true
+    e.HidePort = true
+
     // 自定义错误处理
-    e.HTTPErrorHandler = HTTPErrorHandler
+    e.HTTPErrorHandler = httpErrorHandler
 
     // 调试状态
     debug := global.Conf.App.Debug
@@ -214,12 +235,15 @@ func Start() {
         return ctx.String(http.StatusNotFound, "not found")
     })
 
+    // 显示信息
+    showBanner()
+
     // 设置端口
     e.Logger.Fatal(e.Start(global.Conf.Server.Address))
 }
 
 // 自定义错误
-func HTTPErrorHandler(err error, ctx echo.Context) {
+func httpErrorHandler(err error, ctx echo.Context) {
     code := http.StatusInternalServerError
     if he, ok := err.(*echo.HTTPError); ok {
         code = he.Code
@@ -243,5 +267,21 @@ func HTTPErrorHandler(err error, ctx echo.Context) {
     // 输出字符
     if repErr != nil {
         ctx.Logger().Error(repErr)
+    }
+}
+
+// 控制台显示信息
+func showBanner() {
+    colorer := color.New()
+
+    colorer.Printf(
+        banner,
+        colorer.Red("v" + global.Conf.App.Version),
+        colorer.Green("v" + echo.Version),
+        colorer.Blue(website),
+    )
+
+    if global.Conf.App.Debug {
+        colorer.Printf("https server started on %s\n", colorer.Green(global.Conf.Server.Address))
     }
 }

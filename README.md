@@ -7,8 +7,8 @@
 
 *  使用 `go` 开发的文件管理工具
 *  web 框架使用 `go` 框架 `echo`
-*  默认打包配置文件、静态文件和模板文件。可更改 `app/boot/boot.go` 文件内 `global.IsOnlyEmbed` 为 `false` 自定义配置文件和模板文件
 *  模板库使用 `pongo2` 库，语法接近 `python` 的 `django` 框架
+*  默认打包配置文件、静态文件和模板文件。可更改 `app/boot/boot.go` 文件内 `global.IsOnlyEmbed` 为 `false` 自定义配置文件和模板文件
 *  生成一个文件即可部署
 
 
