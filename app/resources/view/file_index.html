@@ -20,12 +20,12 @@
                 <div class="main-box clearfix">
                     <header class="main-box-header clearfix">
                         <div class="pull-left">
-                            <h2>文件列表 | {{ name }}</h2>
+                            <h2>文件列表</h2>
 
                             {% if path == "" %}
-                                <div class="fs-path" id="fs-path" data-path="/">/</div>
+                                <div class="label label-default text-muted fs-path" id="fs-path" data-path="/">/</div>
                             {% else %}
-                                <div class="fs-path" id="fs-path" data-path="{{ path }}">{{ path }}</div>
+                                <div class="label label-default text-muted fs-path" id="fs-path" data-path="{{ path }}">{{ path }}</div>
                             {% endif %}
                         </div>
 

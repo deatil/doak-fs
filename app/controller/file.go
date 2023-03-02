@@ -21,7 +21,11 @@ type File struct{
 func (this *File) Index(ctx echo.Context) error {
     path := ctx.QueryParam("path")
 
-    list := global.Fs.Ls(path)
+    dirList := global.Fs.LsDir(path)
+    fileList := global.Fs.LsFile(path)
+
+    list := append(dirList, fileList...)
+
     name := global.Fs.Basename(path)
 
     parentPath := global.Fs.ParentPath(path)
@@ -316,10 +320,11 @@ func (this *File) PreviewFile(ctx echo.Context) error {
     }
 
     data := global.Fs.Read(file)
+    dataType := data["type"].(string)
 
-    if data["type"] != "image" &&
-        data["type"] != "audio" &&
-        data["type"] != "video" {
+    if dataType != "image" &&
+        dataType != "audio" &&
+        dataType != "video" {
         return response.String(ctx, "文件不存在")
     }
 
