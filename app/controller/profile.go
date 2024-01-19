@@ -75,3 +75,39 @@ func (this *Profile) PasswordSave(ctx echo.Context) error {
 
     return response.ReturnSuccessJson(ctx, "更改密码成功", "")
 }
+
+// Webdav 账号信息
+func (this *Profile) Webdav(ctx echo.Context) error {
+    username := global.Conf.Webdav.GetFirstUsername()
+
+    return response.Render(ctx, "profile_webdav.html", map[string]any{
+        "wusername": username,
+    })
+}
+
+// Webdav 账号信息 保存
+func (this *Profile) WebdavSave(ctx echo.Context) error {
+    pass := ctx.FormValue("pass")
+    if pass == "" {
+        return response.ReturnErrorJson(ctx, "密码不能为空")
+    }
+
+    // 新密码
+    newPass := utils.PasswordHash(pass)
+
+    username := global.Conf.Webdav.GetFirstUsername()
+
+    // 更改密码
+    global.Conf.Webdav = global.Conf.Webdav.UpdatePassword(username, newPass)
+
+    // 更改配置信息
+    if global.ConfigFile != "" && !global.IsOnlyEmbed {
+        // 写入配置
+        err := config.WriteConfig(global.ConfigFile, global.Conf)
+        if err != nil {
+            return response.ReturnErrorJson(ctx, "更改密码失败")
+        }
+    }
+
+    return response.ReturnSuccessJson(ctx, "更改密码成功", "")
+}

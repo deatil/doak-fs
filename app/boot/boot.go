@@ -4,6 +4,7 @@ import (
     "fmt"
     "time"
     "flag"
+    "strings"
     "net/http"
 
     "github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
     "github.com/labstack/gommon/log"
     "github.com/labstack/gommon/color"
 
+    "github.com/deatil/doak-fs/pkg/utils"
     "github.com/deatil/doak-fs/pkg/global"
     "github.com/deatil/doak-fs/pkg/logger"
     "github.com/deatil/doak-fs/pkg/session"
@@ -19,6 +21,7 @@ import (
 
     "github.com/deatil/doak-fs/app/view"
     "github.com/deatil/doak-fs/app/route"
+    "github.com/deatil/doak-fs/app/webdav"
     "github.com/deatil/doak-fs/app/resources"
 )
 
@@ -38,15 +41,20 @@ _____________________________________________________
 `
 )
 
+var makePass string
+
 // 初始化
-func init() {
+func initServer() {
     // 系统启动参数
-    config := flag.String("config", "", "配置文件")
-    view   := flag.String("view", "", "是否导入模板")
+    config := flag.String("config", "", "config file")
+    view   := flag.String("view", "", "view path")
+    pass   := flag.String("pass", "", "make Pass")
     flag.Parse()
 
     global.ConfigFile = *config
     global.ViewPath = *view
+
+    makePass = *pass
 
     // 只使用打包文件
     global.IsOnlyEmbed = true
@@ -60,6 +68,19 @@ func init() {
 
 // 运行
 func Start() {
+    initServer()
+
+    if makePass != "" {
+        newPass := utils.PasswordHash(makePass)
+        fmt.Println("new password: " + newPass)
+        return
+    }
+
+    runServer()
+}
+
+// 运行
+func runServer() {
     // 初始化 echo
     e := echo.New()
 
@@ -129,7 +150,14 @@ func Start() {
 
     // CSRF
     e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-        Skipper:        middleware.DefaultSkipper,
+        Skipper:        func(ctx echo.Context) bool {
+            path := ctx.Request().URL.String()
+            if strings.HasPrefix(path, "/dav") {
+                return true
+            }
+
+            return false
+        },
         TokenLength:    global.Conf.Server.CSRFTokenLength,
         TokenLookup:    "cookie:" + global.Conf.Server.CSRFCookieName,
         ContextKey:     global.Conf.Server.CSRFContextKey,
@@ -222,6 +250,9 @@ func Start() {
     // 静态文件
     assetHandler := http.FileServer(resources.StaticAssets())
     e.GET("/static/*", echo.WrapHandler(http.StripPrefix("/static/", assetHandler)))
+
+    // webdav
+    webdav.Route(e.Group("/dav"))
 
     // 路由
     route.Route(e)

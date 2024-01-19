@@ -1,6 +1,6 @@
 [app]
 app_name = 'doak-fs'
-version = '1.0.3'
+version = '1.0.5'
 debug = true
 time_zone = 'Asia/Hong_Kong'
 log_file = './fs-log.log'
@@ -25,6 +25,10 @@ driver = 'local'
 
 [user]
 names = ['admin:$2a$10$EnHCul2nbg0ZmvL0OEdoOOC4hkzniHO8zFS/vlGVSKYGlMX53qZNu']
+
+[webdav]
+users = ['webnav:$2a$10$EnHCul2nbg0ZmvL0OEdoOOC4hkzniHO8zFS/vlGVSKYGlMX53qZNu']
+path = './'
 
 [session]
 secret = 'secret'

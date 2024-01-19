@@ -10,6 +10,7 @@
 *  模板库使用 `pongo2` 库，语法接近 `python` 的 `django` 框架
 *  默认打包配置文件、静态文件和模板文件。可更改 `app/boot/boot.go` 文件内 `global.IsOnlyEmbed` 为 `false` 自定义配置文件和模板文件
 *  生成一个文件即可部署
+*  添加 WebDAV 支持
 
 
 ### 截图预览
@@ -42,7 +43,7 @@ go run main.go --config=config.toml
 go run main.go --view=template
 ```
 
-3. 登录账号: `admin` / `123456`
+3. 登录账号: `admin` / `123456`, WebDAV 账号: `webnav` / `123456`
 
 
 ### 特别鸣谢

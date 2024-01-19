@@ -25,6 +25,9 @@ func Route(e *echo.Echo) {
         profileController := new(controller.Profile)
         profileGroup.GET("/password", profileController.Password)
         profileGroup.POST("/password", profileController.PasswordSave)
+
+        profileGroup.GET("/webdav", profileController.Webdav)
+        profileGroup.POST("/webdav", profileController.WebdavSave)
     }
 
     // 文件管理

@@ -13,6 +13,7 @@ type Conf struct {
     Server  `toml:"server"`
     File    `toml:"file"`
     User    `toml:"user"`
+    Webdav  `toml:"webdav"`
     Session `toml:"session"`
 }
 
@@ -45,7 +46,6 @@ type User struct {
     Names []string `toml:"names"`
 }
 
-// 更改密码
 func (this User) GetUsers() map[string]string {
     users := make(map[string]string)
 
@@ -82,6 +82,62 @@ func (this User) UpdatePassword(name string, pass string) User {
     this.Names = make([]string, 0)
     for name, pass := range users {
         this.Names = append(this.Names, fmt.Sprintf("%s:%s", name, pass))
+    }
+
+    return this
+}
+
+type Webdav struct {
+    Users []string `toml:"users"`
+    Path  string `toml:"path"`
+}
+
+func (this Webdav) GetUsers() map[string]string {
+    users := make(map[string]string)
+
+    for _, user := range this.Users {
+        newUser := strings.SplitN(user, ":", 2)
+        users[newUser[0]] = newUser[1]
+    }
+
+    return users
+}
+
+
+func (this Webdav) GetFirstUsername() string {
+    for _, user := range this.Users {
+        newUser := strings.SplitN(user, ":", 2)
+        return newUser[0]
+    }
+
+    return ""
+}
+
+// 账号密码
+func (this Webdav) GetUserPassword(name string) string {
+    users := this.GetUsers()
+
+    if password, ok := users[name]; ok {
+        return password
+    }
+
+    return ""
+}
+
+// 更改密码
+func (this Webdav) UpdatePassword(name, pass string) Webdav {
+    users := this.GetUsers()
+
+    _, ok := users[name]
+    if !ok {
+        return this
+    }
+
+    users[name] = pass
+
+    this.Users = make([]string, 0)
+    for name, pass := range users {
+        this.Users = append(this.Users, fmt.Sprintf("%s:%s", name, pass))
     }
 
     return this
